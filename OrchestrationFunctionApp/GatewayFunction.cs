@@ -33,7 +33,7 @@ namespace OrchestrationFunctionApp
             string sessionId = (string)payload.CorrelationId;
             //string sessionId = Guid.NewGuid().ToString();
 
-            for (int i = 1; i < 10; i++)
+            for (int i = 1; i <= 10; i++)
             {
                 // Send the Message 
                 ServiceBusMessage message = new ServiceBusMessage(requestBody);

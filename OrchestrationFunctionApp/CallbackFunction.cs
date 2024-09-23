@@ -10,16 +10,16 @@ namespace OrchestrationFunctionApp
     {
         [FunctionName("CallbackFunction")]
         public static async Task Run(
-        [ServiceBusTrigger("pipeline-event", Connection = "QueueConnectionString", IsSessionsEnabled = true)] ServiceBusReceivedMessage message, ILogger log)
+        [ServiceBusTrigger("pipeline-event", Connection = "QueueConnectionString")] ServiceBusReceivedMessage message, ILogger log)
         {
             try
             {
-                log.LogInformation($"Received message with ApplicationId: {message.ApplicationProperties["SequenceId"]}");
+                log.LogInformation($"Received message with SequenceId: {message.ApplicationProperties["SequenceId"]}");
                 string messageBody = System.Text.Encoding.UTF8.GetString(message.Body);
 
                 // Simulate processing
                 log.LogInformation($"Message body: {messageBody}");
-                await Task.Delay(1000);  // Simulate some processing work
+                await Task.Delay(5000);  // Simulate some processing work
             }
             catch (Exception ex)
             {
