@@ -1,0 +1,14 @@
+{
+  "profiles": {
+    "OrchestrationFunctionApp": {
+      "commandName": "Project",
+      "commandLineArgs": "--port 7298"
+    },
+    "Container (Dockerfile)": {
+      "commandName": "Docker",
+      "launchUrl": "{Scheme}://{ServiceHost}:{ServicePort}",
+      "httpPort": 30600,
+      "useSSL": false
+    }
+  }
+}
