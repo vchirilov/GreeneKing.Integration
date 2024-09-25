@@ -1,0 +1,28 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {},
+  "functions": [],
+  "variables": {},
+  "resources": [
+    {
+      "apiVersion": "2021-11-01",
+      "name": "gk-service-bus-pipeline-orchestration",
+      "type": "Microsoft.ServiceBus/Namespaces",
+      "location": "northeurope",
+      "tags": {},
+      "properties": {
+        "disableLocalAuth": false,
+        "zoneRedundant": false,
+        "serviceBusEndpoint": "https://gk-service-bus-pipeline-orchestration.servicebus.windows.net:443/",
+        "provisioningState": "Succeeded",
+        "status": "Active"
+      },
+      "sku": {
+        "name": "Standard",
+        "tier": "Standard"
+      }
+    }
+  ],
+  "outputs": {}
+}
