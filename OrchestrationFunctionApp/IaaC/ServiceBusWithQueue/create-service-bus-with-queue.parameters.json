@@ -3,7 +3,7 @@
   "contentVersion": "1.0.0.0",
   "parameters": {
     "serviceBusNamespaceName": {
-      "value": "gk-pipeline-orchestration-using-iaac"
+      "value": "gk-pipeline-orchestration"
     },
     "queueName": {
       "value": "pipeline-event"

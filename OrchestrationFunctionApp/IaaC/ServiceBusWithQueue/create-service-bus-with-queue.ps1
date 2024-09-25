@@ -1,5 +1,5 @@
 # Variables
-$resourceGroupName = "z114-d-evnt-using-iaac"
+$resourceGroupName = "z114-d-evnt"
 $templateFile = "create-service-bus-with-queue.json"
 $parametersFile = "create-service-bus-with-queue.parameters.json" # Path to the parameters file
 $location = "westeurope"
