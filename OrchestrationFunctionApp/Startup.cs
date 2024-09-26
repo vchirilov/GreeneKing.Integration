@@ -15,7 +15,8 @@ namespace OrchestrationFunctionApp
         public override void Configure(IFunctionsHostBuilder builder)
         {
             builder.Services.AddLogging();
-            builder.Services.AddScoped<IHttpService, HttpService>();            
+            builder.Services.AddScoped<IHttpService, HttpService>();
+            builder.Services.AddHttpClient();
         }
     }
 }

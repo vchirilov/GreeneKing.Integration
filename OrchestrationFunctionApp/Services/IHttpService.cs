@@ -1,10 +1,12 @@
-﻿using System.Threading.Tasks;
+﻿using OrchestrationFunctionApp.Models;
+using System;
+using System.Threading.Tasks;
 
 namespace OrchestrationFunctionApp.Services
 {
     public interface IHttpService
     {
-        Task SendGetRequest();
-        Task SendPostRequest();
+        Task GetRequest(Workflow workflow);
+        Task PostRequest(Workflow workflow);
     }
 }

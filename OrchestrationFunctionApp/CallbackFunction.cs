@@ -26,16 +26,14 @@ namespace OrchestrationFunctionApp
         {
             try
             {
-                _logger.LogInformation($"Received message with SequenceId: {message.ApplicationProperties["SequenceId"]}");
-
-                await _httpService.SendGetRequest();
+                _logger.LogInformation($"Received message with SequenceId: {message.ApplicationProperties["SequenceId"]}");               
 
                 string requestBody = System.Text.Encoding.UTF8.GetString(message.Body);
                 Workflow workflow = JsonConvert.DeserializeObject<Workflow>(requestBody);
 
-                // Simulate processing
+                await _httpService.GetRequest(workflow);
+
                 _logger.LogInformation($"Message body: {JsonConvert.SerializeObject(workflow)}");
-                await Task.Delay(5000);  // Simulate some processing work
             }
             catch (Exception ex)
             {
