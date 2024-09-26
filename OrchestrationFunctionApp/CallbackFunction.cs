@@ -3,6 +3,8 @@ using Azure.Messaging.ServiceBus;
 using System.Threading.Tasks;
 using Microsoft.Azure.WebJobs;
 using Microsoft.Extensions.Logging;
+using Newtonsoft.Json;
+using OrchestrationFunctionApp.Models;
 
 namespace OrchestrationFunctionApp
 {
@@ -15,10 +17,11 @@ namespace OrchestrationFunctionApp
             try
             {
                 log.LogInformation($"Received message with SequenceId: {message.ApplicationProperties["SequenceId"]}");
-                string messageBody = System.Text.Encoding.UTF8.GetString(message.Body);
+                string requestBody = System.Text.Encoding.UTF8.GetString(message.Body);
+                Workflow workflow = JsonConvert.DeserializeObject<Workflow>(requestBody);
 
                 // Simulate processing
-                log.LogInformation($"Message body: {messageBody}");
+                log.LogInformation($"Message body: {JsonConvert.SerializeObject(workflow)}");
                 await Task.Delay(5000);  // Simulate some processing work
             }
             catch (Exception ex)

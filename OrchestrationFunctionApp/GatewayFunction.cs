@@ -8,6 +8,8 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using Azure.Messaging.ServiceBus;
+using OrchestrationFunctionApp.Models;
+using System.Linq;
 
 namespace OrchestrationFunctionApp
 {
@@ -21,30 +23,35 @@ namespace OrchestrationFunctionApp
             log.LogInformation("Gateway function has started...");
             string requestBody = await new StreamReader(req.Body).ReadToEndAsync();
 
-            // Initialize Service bus connection 
+            // Initialize queue sender
             string connectionstring = Environment.GetEnvironmentVariable("QueueConnectionString");
             ServiceBusClient serviceBusClient = new ServiceBusClient(connectionstring);
-
-            // Initialize a sender object with queue name
             var pipelineEventQueueSender = serviceBusClient.CreateSender("pipeline-event");
 
-            // Create message for service bus
-            dynamic payload = JsonConvert.DeserializeObject(requestBody);
-            string sessionId = (string)payload.CorrelationId;
-            //string sessionId = Guid.NewGuid().ToString();
+            // Deserialize payload into PipelineDescriptor
+            PipelineDescriptor pipelineDescriptor = JsonConvert.DeserializeObject<PipelineDescriptor>(requestBody);
 
-            for (int i = 1; i <= 10; i++)
+            var workflowsOrderedBy = pipelineDescriptor.Pipeline.OrderBy(x => x.OrderId);
+
+            foreach (var workflow in workflowsOrderedBy)
             {
-                // Send the Message 
-                ServiceBusMessage message = new ServiceBusMessage(requestBody);
-                message.CorrelationId = sessionId;
-                message.ApplicationProperties.Add("SequenceId", i);
-                await pipelineEventQueueSender.SendMessageAsync(message);
-            }
+                await SendMessage(pipelineEventQueueSender, workflow);
+            }            
 
             string responseMessage = "Sent with success.";
             return new OkObjectResult(responseMessage);
 
+        }
+
+        private static async Task SendMessage(ServiceBusSender pipelineEventQueueSender, Workflow workflow)
+        {
+            var jsonWorkflow = JsonConvert.SerializeObject(workflow);
+
+            ServiceBusMessage message = new ServiceBusMessage(jsonWorkflow);
+            message.CorrelationId = "abcd";
+            message.ApplicationProperties.Add("SequenceId", 'a');
+            
+            await pipelineEventQueueSender.SendMessageAsync(message);
         }
     }
 }
