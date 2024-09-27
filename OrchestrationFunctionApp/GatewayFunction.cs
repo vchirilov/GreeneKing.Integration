@@ -10,17 +10,29 @@ using Newtonsoft.Json;
 using Azure.Messaging.ServiceBus;
 using OrchestrationFunctionApp.Models;
 using System.Linq;
+using Microsoft.Extensions.Options;
+using Microsoft.Azure.WebJobs.ServiceBus;
 
 namespace OrchestrationFunctionApp
 {
-    public static class GatewayFunction
+    public class GatewayFunction
     {
-        [FunctionName("GatewayFunction")]
-        public static async Task<IActionResult> Run(
-            [HttpTrigger(AuthorizationLevel.Function, "get", "post", Route = null)] HttpRequest req,
-            ILogger log)
+        private readonly ILogger<GatewayFunction> _logger;
+        private readonly IOptions<ServiceBusOptions> _serviceBusOptions;
+
+        public GatewayFunction(ILogger<GatewayFunction> logger, IOptions<ServiceBusOptions> serviceBusOptions)
         {
-            log.LogInformation("Gateway function has started...");
+            _logger = logger;
+            _serviceBusOptions = serviceBusOptions;
+        }
+
+        [FunctionName("GatewayFunction")]
+        public async Task<IActionResult> Run(
+            [HttpTrigger(AuthorizationLevel.Function, "get", "post", Route = null)] HttpRequest req)
+        {
+            _logger.LogInformation("Gateway function has started...");
+            //_logger.LogInformation(_serviceBusOptions);
+
             string requestBody = await new StreamReader(req.Body).ReadToEndAsync();
 
             // Initialize queue sender
@@ -36,7 +48,7 @@ namespace OrchestrationFunctionApp
             foreach (var workflow in workflowsOrderedBy)
             {
                 await SendMessage(pipelineEventQueueSender, workflow);
-            }            
+            }
 
             string responseMessage = "Sent with success.";
             return new OkObjectResult(responseMessage);
@@ -50,7 +62,7 @@ namespace OrchestrationFunctionApp
             ServiceBusMessage message = new ServiceBusMessage(jsonWorkflow);
             message.CorrelationId = "abcd";
             message.ApplicationProperties.Add("SequenceId", 'a');
-            
+
             await pipelineEventQueueSender.SendMessageAsync(message);
         }
     }
