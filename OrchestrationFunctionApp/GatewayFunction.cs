@@ -17,13 +17,13 @@ namespace OrchestrationFunctionApp
 {
     public class GatewayFunction
     {
-        private readonly ILogger<GatewayFunction> _logger;
-        private readonly IOptions<ServiceBusSettings> _serviceBusSettings;
+        private readonly ILogger<GatewayFunction> _logger;        
+        private readonly ServiceBusSettings _serviceBusSettings;
 
         public GatewayFunction(ILogger<GatewayFunction> logger, IOptions<ServiceBusSettings> serviceBusSettings)
         {
             _logger = logger;
-            _serviceBusSettings = serviceBusSettings;
+            _serviceBusSettings = serviceBusSettings.Value;
         }
 
         [FunctionName("GatewayFunction")]
@@ -34,10 +34,9 @@ namespace OrchestrationFunctionApp
 
             string requestBody = await new StreamReader(req.Body).ReadToEndAsync();
 
-            // Initialize queue sender
-            string connectionstring = Environment.GetEnvironmentVariable("QueueConnectionString");
-            ServiceBusClient serviceBusClient = new ServiceBusClient(connectionstring);
-            var pipelineEventQueueSender = serviceBusClient.CreateSender("pipeline-event");
+            // Initialize queue sender            
+            ServiceBusClient serviceBusClient = new ServiceBusClient(_serviceBusSettings.QueueConnectionString);
+            var pipelineEventQueueSender = serviceBusClient.CreateSender(_serviceBusSettings.QueueName);
 
             // Deserialize payload into PipelineDescriptor
             PipelineDescriptor pipelineDescriptor = JsonConvert.DeserializeObject<PipelineDescriptor>(requestBody);
