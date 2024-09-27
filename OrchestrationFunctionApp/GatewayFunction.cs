@@ -11,19 +11,19 @@ using Azure.Messaging.ServiceBus;
 using OrchestrationFunctionApp.Models;
 using System.Linq;
 using Microsoft.Extensions.Options;
-using Microsoft.Azure.WebJobs.ServiceBus;
+using OrchestrationFunctionApp.Options;
 
 namespace OrchestrationFunctionApp
 {
     public class GatewayFunction
     {
         private readonly ILogger<GatewayFunction> _logger;
-        private readonly IOptions<ServiceBusOptions> _serviceBusOptions;
+        private readonly IOptions<ServiceBusSettings> _serviceBusSettings;
 
-        public GatewayFunction(ILogger<GatewayFunction> logger, IOptions<ServiceBusOptions> serviceBusOptions)
+        public GatewayFunction(ILogger<GatewayFunction> logger, IOptions<ServiceBusSettings> serviceBusSettings)
         {
             _logger = logger;
-            _serviceBusOptions = serviceBusOptions;
+            _serviceBusSettings = serviceBusSettings;
         }
 
         [FunctionName("GatewayFunction")]
@@ -31,7 +31,6 @@ namespace OrchestrationFunctionApp
             [HttpTrigger(AuthorizationLevel.Function, "get", "post", Route = null)] HttpRequest req)
         {
             _logger.LogInformation("Gateway function has started...");
-            //_logger.LogInformation(_serviceBusOptions);
 
             string requestBody = await new StreamReader(req.Body).ReadToEndAsync();
 

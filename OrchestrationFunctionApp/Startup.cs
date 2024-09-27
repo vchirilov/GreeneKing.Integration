@@ -1,7 +1,7 @@
 ﻿using Microsoft.Azure.Functions.Extensions.DependencyInjection;
-using Microsoft.Azure.WebJobs.ServiceBus;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using OrchestrationFunctionApp.Options;
 using OrchestrationFunctionApp.Services;
 using System;
 using System.Collections.Generic;
@@ -21,7 +21,7 @@ namespace OrchestrationFunctionApp
             builder.Services.AddScoped<IHttpService, HttpService>();
             builder.Services.AddHttpClient();
 
-            builder.Services.AddOptions<ServiceBusOptions>()
+            builder.Services.AddOptions<ServiceBusSettings>()
                 .Configure<IConfiguration>((settings, configuration) =>
                 {
                     configuration.GetSection("ServiceBus").Bind(settings);
