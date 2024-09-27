@@ -26,5 +26,6 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="IaaC\ServiceBusWithQueue\" />
+    <Folder Include="Properties\PublishProfiles\" />
   </ItemGroup>
 </Project>
