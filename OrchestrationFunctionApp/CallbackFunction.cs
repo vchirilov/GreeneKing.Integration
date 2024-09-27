@@ -22,7 +22,7 @@ namespace OrchestrationFunctionApp
 
         [FunctionName("CallbackFunction")]
         public async Task Run(
-        [ServiceBusTrigger("pipeline-event", Connection = "QueueConnectionString")] ServiceBusReceivedMessage message)
+        [ServiceBusTrigger("%QueueName%", Connection = "QueueConnectionString")] ServiceBusReceivedMessage message)
         {
             try
             {
