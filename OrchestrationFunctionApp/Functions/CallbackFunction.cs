@@ -7,7 +7,7 @@ using Newtonsoft.Json;
 using OrchestrationFunctionApp.Models;
 using OrchestrationFunctionApp.Services;
 
-namespace OrchestrationFunctionApp
+namespace OrchestrationFunctionApp.Functions
 {
     public class CallbackFunction
     {
@@ -20,25 +20,34 @@ namespace OrchestrationFunctionApp
             _logger = logger;
         }
 
-        [FunctionName("CallbackFunction")]
+        [FunctionName("callback-function")]
         public async Task Run(
         [ServiceBusTrigger("%QueueName%", Connection = "QueueConnectionString")] ServiceBusReceivedMessage message)
         {
             try
             {
-                _logger.LogInformation($"Received message with SequenceId: {message.ApplicationProperties["SequenceId"]}");               
+                _logger.LogInformation("Callback function has started...");               
 
                 string requestBody = System.Text.Encoding.UTF8.GetString(message.Body);
                 Workflow workflow = JsonConvert.DeserializeObject<Workflow>(requestBody);
 
+                if (workflow.Method.ToLower() == "get")
+                {
+                    await _httpService.GetRequest(workflow);
+                }
+                else if (workflow.Method.ToLower() == "post")
+                {
+                    await _httpService.PostRequest(workflow);
+                }
+
                 await _httpService.GetRequest(workflow);
 
-                _logger.LogInformation($"Message body: {JsonConvert.SerializeObject(workflow)}");
+                _logger.LogInformation($"CallbackFunction Message Body: {JsonConvert.SerializeObject(workflow)}");
             }
             catch (Exception ex)
             {
-                _logger.LogError($"Failed to process message: {ex.Message}");
+                _logger.LogError($"CallbackFunction failed to process message: {ex.Message}");
             }
-        }
+        }       
     }
 }

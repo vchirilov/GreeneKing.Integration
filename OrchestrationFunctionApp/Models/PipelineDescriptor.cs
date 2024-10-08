@@ -16,6 +16,8 @@ namespace OrchestrationFunctionApp.Models
         public int OrderId { get; set; }
         public string Service { get; set; }
         public string ServiceURL { get; set; }
+        public string Method { get; set; }
+        public dynamic Body { get; set; }
         public string Action { get; set; }
         public Parameters Parameters { get; set; }
     }
@@ -25,5 +27,5 @@ namespace OrchestrationFunctionApp.Models
         public string Argument1 { get; set; }
         public string Argument2 { get; set; }
         
-    }
+    }    
 }

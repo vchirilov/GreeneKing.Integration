@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
+using Newtonsoft.Json;
 using OrchestrationFunctionApp.Models;
 using System;
 using System.Collections.Generic;
@@ -35,9 +36,13 @@ namespace OrchestrationFunctionApp.Services
             }
         }
 
-        public Task PostRequest(Workflow workflow)
+        public async Task PostRequest(Workflow workflow)
         {
-            return Task.CompletedTask;
+            _httpClient.DefaultRequestHeaders.Add("aeg-sas-key", "value");
+
+            var content = new StringContent(workflow.Body.ToString(), Encoding.UTF8, "application/json");
+
+            var response = await _httpClient.PostAsync(workflow.ServiceURL, content);
         }
     }
 }
