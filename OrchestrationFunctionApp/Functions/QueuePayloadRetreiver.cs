@@ -12,7 +12,7 @@ namespace OrchestrationFunctionApp.Functions
 {
     public static class QueuePayloadRetreiver
     {
-        [FunctionName("QueuePayloadRetreiver")]
+        [FunctionName("queue-payload-retreiver")]
         public static async Task<IActionResult> Run(
             [HttpTrigger(AuthorizationLevel.Function, "get", "post", Route = null)] HttpRequest req,
             ILogger log)
