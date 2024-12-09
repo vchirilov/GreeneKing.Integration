@@ -11,18 +11,19 @@ using OrchestrationFunctionApp.Options;
 using Microsoft.Extensions.Options;
 using Azure.Messaging.ServiceBus;
 using System.Text;
+using OrchestrationFunctionApp.Services;
 
 namespace OrchestrationFunctionApp.Functions
 {
     public class QueuePayloadRetreiver
     {
-        private readonly ILogger<GatewayFunction> _logger;
-        private readonly ServiceBusSettings _serviceBusSettings;
+        private readonly ILogger<QueuePayloadRetreiver> _logger;
+        private readonly IServiceBroker _serviceBroker;
 
-        public QueuePayloadRetreiver(ILogger<GatewayFunction> logger, IOptions<ServiceBusSettings> serviceBusSettings)
+        public QueuePayloadRetreiver(ILogger<QueuePayloadRetreiver> logger, IServiceBroker serviceBroker)
         {
             _logger = logger;
-            _serviceBusSettings = serviceBusSettings.Value;
+            _serviceBroker = serviceBroker;
         }
 
         [FunctionName("queue-payload-retreiver")]
@@ -41,16 +42,9 @@ namespace OrchestrationFunctionApp.Functions
                 dynamic data = JsonConvert.DeserializeObject(requestBody);
                 queueName = queueName ?? data?.queue;
 
+                var result = await _serviceBroker.RetrieveAsync();
 
-                // Initialize queue sender            
-                ServiceBusClient serviceBusClient = new ServiceBusClient(_serviceBusSettings.QueueConnectionString);
-                var pipelineEventQueueSender = serviceBusClient.CreateSender(_serviceBusSettings.QueueName);                
-
-                string responseMessage = string.IsNullOrEmpty(queueName)
-                    ? "This HTTP triggered function executed successfully. Pass a name in the query string or in the request body for a personalized response."
-                    : $"Hello, {queueName}. This HTTP triggered function executed successfully.";
-
-                return new OkObjectResult(responseMessage);
+                return new OkObjectResult("Hello World");
             }
             catch (Exception ex)
             {
