@@ -10,6 +10,7 @@ using Newtonsoft.Json;
 using OrchestrationFunctionApp.Options;
 using Microsoft.Extensions.Options;
 using Azure.Messaging.ServiceBus;
+using System.Text;
 
 namespace OrchestrationFunctionApp.Functions
 {
@@ -29,23 +30,33 @@ namespace OrchestrationFunctionApp.Functions
             [HttpTrigger(AuthorizationLevel.Function, "get", "post", Route = null)] HttpRequest req,
             ILogger log)
         {
-            log.LogInformation("C# HTTP trigger function processed a request.");
 
-            string queueName = req.Query["queue"];
+            try
+            {
+                log.LogInformation("C# HTTP trigger function processed a request.");
 
-            string requestBody = await new StreamReader(req.Body).ReadToEndAsync();
-            dynamic data = JsonConvert.DeserializeObject(requestBody);
-            queueName = queueName ?? data?.queue;
+                string queueName = req.Query["queue"];
 
-            string responseMessage = string.IsNullOrEmpty(queueName)
-                ? "This HTTP triggered function executed successfully. Pass a name in the query string or in the request body for a personalized response."
-                : $"Hello, {queueName}. This HTTP triggered function executed successfully.";
+                string requestBody = await new StreamReader(req.Body).ReadToEndAsync();
+                dynamic data = JsonConvert.DeserializeObject(requestBody);
+                queueName = queueName ?? data?.queue;
 
-            // Initialize queue sender            
-            ServiceBusClient serviceBusClient = new ServiceBusClient(_serviceBusSettings.QueueConnectionString);
-            var pipelineEventQueueSender = serviceBusClient.CreateSender(_serviceBusSettings.QueueName);
 
-            return new OkObjectResult(responseMessage);
+                // Initialize queue sender            
+                ServiceBusClient serviceBusClient = new ServiceBusClient(_serviceBusSettings.QueueConnectionString);
+                var pipelineEventQueueSender = serviceBusClient.CreateSender(_serviceBusSettings.QueueName);                
+
+                string responseMessage = string.IsNullOrEmpty(queueName)
+                    ? "This HTTP triggered function executed successfully. Pass a name in the query string or in the request body for a personalized response."
+                    : $"Hello, {queueName}. This HTTP triggered function executed successfully.";
+
+                return new OkObjectResult(responseMessage);
+            }
+            catch (Exception ex)
+            {
+                return new BadRequestObjectResult(ex);
+            }
+            
         }
     }
 }
