@@ -17,15 +17,13 @@ namespace OrchestrationFunctionApp.Services
     {
         private readonly ILogger<ServiceBroker> _logger;
         private readonly ServiceBusSettings _serviceBusSettings;
-        private IList<string> _messages;
-        private IList<string> _exceptions;
+        private IList<string> _messages = new List<string>();
+        private IList<string> _exceptions = new List<string>();
 
         public ServiceBroker(ILogger<ServiceBroker> logger, IOptions<ServiceBusSettings> serviceBusSettings)
         {
             _logger = logger;
             _serviceBusSettings = serviceBusSettings.Value;
-            _messages = new List<string>();
-            _exceptions = new List<string>();
         }
 
         public async Task PublishAsync(object message)
@@ -50,8 +48,7 @@ namespace OrchestrationFunctionApp.Services
                 await Task.Delay(3000);
                 await queueProcessor.StopProcessingAsync();
 
-                var response = new QueueMessageResponse { Messages = _messages, Errors = _exceptions };                
-                return response;
+                return new QueueMessageResponse { Messages = _messages, Errors = _exceptions };                
             }
             catch (Exception ex)
             {
