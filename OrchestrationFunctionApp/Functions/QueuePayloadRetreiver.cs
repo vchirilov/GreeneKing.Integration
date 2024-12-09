@@ -12,6 +12,7 @@ using Microsoft.Extensions.Options;
 using Azure.Messaging.ServiceBus;
 using System.Text;
 using OrchestrationFunctionApp.Services;
+using System.Linq;
 
 namespace OrchestrationFunctionApp.Functions
 {
@@ -31,26 +32,29 @@ namespace OrchestrationFunctionApp.Functions
             [HttpTrigger(AuthorizationLevel.Function, "get", "post", Route = null)] HttpRequest req,
             ILogger log)
         {
-
             try
             {
-                log.LogInformation("C# HTTP trigger function processed a request.");
+                log.LogInformation("[queue-payload-retreiver] azure-function has been activated.");
+            
+                var queue = await GetQueueName(req);
+                
+                var message = await _serviceBroker.RetrieveAsync(queue);
 
-                string queueName = req.Query["queue"];
-
-                string requestBody = await new StreamReader(req.Body).ReadToEndAsync();
-                dynamic data = JsonConvert.DeserializeObject(requestBody);
-                queueName = queueName ?? data?.queue;
-
-                var result = await _serviceBroker.RetrieveAsync();
-
-                return new OkObjectResult("Hello World");
+                return new OkObjectResult(message.Payload);
             }
             catch (Exception ex)
             {
                 return new BadRequestObjectResult(ex);
-            }
-            
+            }            
+        }
+
+        private async Task<string> GetQueueName(HttpRequest req)
+        {
+            string queue = req.Query["queue"];
+            string requestBody = await new StreamReader(req.Body).ReadToEndAsync();
+            dynamic data = JsonConvert.DeserializeObject(requestBody);
+
+            return queue ?? data?.queue; 
         }
     }
 }

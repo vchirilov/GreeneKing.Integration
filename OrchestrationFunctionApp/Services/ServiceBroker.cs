@@ -3,6 +3,7 @@ using Google.Protobuf;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using OrchestrationFunctionApp.Functions;
+using OrchestrationFunctionApp.Models;
 using OrchestrationFunctionApp.Options;
 using System;
 using System.Collections.Generic;
@@ -35,23 +36,27 @@ namespace OrchestrationFunctionApp.Services
             await Task.CompletedTask;
         }
 
-        public async Task<IList<string>> RetrieveAsync()
+        public async Task<QueueMessageResponse> RetrieveAsync(string queue)
         {
             var serviceBrokerClient = new ServiceBusClient(_serviceBusSettings.QueueConnectionString);
-            var queueProcessor = serviceBrokerClient.CreateProcessor(_serviceBusSettings.QueueName, new ServiceBusProcessorOptions());
+            var queueProcessor = serviceBrokerClient.CreateProcessor(queue, new ServiceBusProcessorOptions());
 
             try
             {
                 queueProcessor.ProcessMessageAsync += MessageHandler;
                 queueProcessor.ProcessErrorAsync += MessageErrorHandler;
+                
                 await queueProcessor.StartProcessingAsync();
-                await Task.Delay(2000);
+                await Task.Delay(3000);
                 await queueProcessor.StopProcessingAsync();
-                return _messages;
+
+                var response = new QueueMessageResponse { Messages = _messages, Errors = _exceptions };                
+                return response;
             }
             catch (Exception ex)
             {
-                return await Task.FromResult(_exceptions);
+                _logger.LogError(ex.Message);
+                return await Task.FromResult(new QueueMessageResponse());
             }            
         }
 

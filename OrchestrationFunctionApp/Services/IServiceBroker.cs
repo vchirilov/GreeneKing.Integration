@@ -1,4 +1,5 @@
-﻿using System;
+﻿using OrchestrationFunctionApp.Models;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -9,6 +10,7 @@ namespace OrchestrationFunctionApp.Services
     public interface IServiceBroker
     {
         Task PublishAsync(object message);
-        Task<IList<string>> RetrieveAsync();
+
+        Task<QueueMessageResponse> RetrieveAsync(string queue);
     }
 }
