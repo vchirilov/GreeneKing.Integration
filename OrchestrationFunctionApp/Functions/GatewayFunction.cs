@@ -37,7 +37,7 @@ namespace OrchestrationFunctionApp.Functions
                 string requestBody = await new StreamReader(req.Body).ReadToEndAsync();
 
                 // Initialize queue sender            
-                ServiceBusClient serviceBusClient = new ServiceBusClient(_serviceBusSettings.QueueConnectionString);
+                ServiceBusClient serviceBusClient = new ServiceBusClient(_serviceBusSettings.ConnectionString);
                 var pipelineEventQueueSender = serviceBusClient.CreateSender(_serviceBusSettings.QueueName);
 
                 // Deserialize payload into PipelineDescriptor

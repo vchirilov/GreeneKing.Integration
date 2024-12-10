@@ -8,7 +8,7 @@ namespace OrchestrationFunctionApp.Options
 {
     public class ServiceBusSettings
     {
-        public string QueueConnectionString { get; set; }
+        public string ConnectionString { get; set; }
         public string QueueName { get; set; }
     }
 }

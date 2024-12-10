@@ -28,7 +28,7 @@ namespace OrchestrationFunctionApp.Services
 
         public async Task PublishAsync(object message)
         {
-            var serviceBrokerClient = new ServiceBusClient(_serviceBusSettings.QueueConnectionString);
+            var serviceBrokerClient = new ServiceBusClient(_serviceBusSettings.ConnectionString);
             var queueSender = serviceBrokerClient.CreateSender(_serviceBusSettings.QueueName);
 
             await Task.CompletedTask;
@@ -36,7 +36,7 @@ namespace OrchestrationFunctionApp.Services
 
         public async Task<QueueMessageResponse> RetrieveAsync(string queue)
         {
-            var serviceBrokerClient = new ServiceBusClient(_serviceBusSettings.QueueConnectionString);
+            var serviceBrokerClient = new ServiceBusClient(_serviceBusSettings.ConnectionString);
             var queueProcessor = serviceBrokerClient.CreateProcessor(queue, new ServiceBusProcessorOptions());
 
             try
