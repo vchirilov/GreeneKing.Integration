@@ -42,7 +42,7 @@ namespace OrchestrationFunctionApp.Functions
 
                 if (message != null && message.Messages.Count() > 1)
                 {
-                    _logger.LogWarning($"{message.Messages.Count()} messages have been captured. Only one message must be captured.");
+                    _logger.LogWarning($"Warning! {message.Messages.Count()} messages have been captured. Only one message must be captured.");
                 }
                                 
                 return new OkObjectResult(message.Payload ?? "0");
