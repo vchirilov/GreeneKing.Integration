@@ -40,7 +40,12 @@ namespace OrchestrationFunctionApp.Functions
                 
                 var message = await _serviceBroker.RetrieveAsync(queue);
 
-                return new OkObjectResult(message.Payload);
+                if (message != null && message.Messages.Count() > 1)
+                {
+                    _logger.LogWarning($"{message.Messages.Count()} messages have been captured. Only one message must be captured.");
+                }
+                                
+                return new OkObjectResult(message.Payload ?? "0");
             }
             catch (Exception ex)
             {

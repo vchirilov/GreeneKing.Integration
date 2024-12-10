@@ -11,6 +11,6 @@ namespace OrchestrationFunctionApp.Services
     {
         Task PublishAsync(object message);
 
-        Task<QueueMessageResponse> RetrieveAsync(string queue);
+        Task<MessageResponse> RetrieveAsync(string queue);
     }
 }

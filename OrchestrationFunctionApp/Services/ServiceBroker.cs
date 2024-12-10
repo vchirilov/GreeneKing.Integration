@@ -17,7 +17,7 @@ namespace OrchestrationFunctionApp.Services
     {
         private readonly ILogger<ServiceBroker> _logger;
         private readonly ServiceBusSettings _serviceBusSettings;
-        private IList<string> _messages = new List<string>();
+        private IList<ServiceBusReceivedMessage> _messages = new List<ServiceBusReceivedMessage>();
         private IList<string> _exceptions = new List<string>();
 
         public ServiceBroker(ILogger<ServiceBroker> logger, IOptions<ServiceBusSettings> serviceBusSettings)
@@ -34,7 +34,7 @@ namespace OrchestrationFunctionApp.Services
             await Task.CompletedTask;
         }
 
-        public async Task<QueueMessageResponse> RetrieveAsync(string queue)
+        public async Task<MessageResponse> RetrieveAsync(string queue)
         {
             var serviceBrokerClient = new ServiceBusClient(_serviceBusSettings.ConnectionString);
             var queueProcessor = serviceBrokerClient.CreateProcessor(queue, new ServiceBusProcessorOptions());
@@ -48,22 +48,21 @@ namespace OrchestrationFunctionApp.Services
                 await Task.Delay(3000);
                 await queueProcessor.StopProcessingAsync();
 
-                return new QueueMessageResponse { Messages = _messages, Errors = _exceptions };                
+                return new MessageResponse { Messages = _messages, Errors = _exceptions };                
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex.Message);
-                return await Task.FromResult(new QueueMessageResponse());
+                return await Task.FromResult(new MessageResponse());
             }            
         }
 
         private async Task MessageHandler(ProcessMessageEventArgs args)
         {
-            var body = args.Message.Body.ToString();
-            _messages.Add(body);
-            _logger.LogInformation($"Received message: {body}");
+            //var body = args.Message.Body.ToString();
+            _messages.Add(args.Message);
 
-            //Complete the message. Message is deleted from the queue
+            //Complete the message, message is deleted from the queue
             await args.CompleteMessageAsync(args.Message);
         }
 
