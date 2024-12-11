@@ -25,7 +25,7 @@ namespace OrchestrationFunctionApp.Services
             _logger = logger;
             _serviceBusSettings = serviceBusSettings.Value;
 
-            _logger.LogInformation($"Queue defined in configuration is ${_serviceBusSettings.QueueName}");
+            _logger.LogInformation($"Queue defined in configuration is {_serviceBusSettings.QueueName}");
         }
 
         public async Task PublishAsync(object message)
