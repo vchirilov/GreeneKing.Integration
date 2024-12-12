@@ -13,6 +13,7 @@ using Azure.Messaging.ServiceBus;
 using System.Text;
 using OrchestrationFunctionApp.Services;
 using System.Linq;
+using Microsoft.Extensions.Configuration;
 
 namespace OrchestrationFunctionApp.Functions
 {
@@ -20,11 +21,13 @@ namespace OrchestrationFunctionApp.Functions
     {
         private readonly ILogger<QueuePayloadRetreiver> _logger;
         private readonly IServiceBroker _serviceBroker;
+        private readonly IConfiguration _configuration;
 
-        public QueuePayloadRetreiver(ILogger<QueuePayloadRetreiver> logger, IServiceBroker serviceBroker)
+        public QueuePayloadRetreiver(ILogger<QueuePayloadRetreiver> logger, IServiceBroker serviceBroker, IConfiguration configuration)
         {
             _logger = logger;
             _serviceBroker = serviceBroker;
+            _configuration = configuration;
         }
 
         [FunctionName("queue-payload-retreiver")]
@@ -44,8 +47,10 @@ namespace OrchestrationFunctionApp.Functions
                 {
                     _logger.LogWarning($"Warning! {message.Messages.Count()} messages have been captured. Only one message must be captured.");
                 }
+
+                var defaultResponse = _configuration[ConfigurationKeys.DefaultResponse] ?? "0";
                                 
-                return new OkObjectResult(message.Payload ?? "0");
+                return new OkObjectResult(message.Payload ?? defaultResponse);
             }
             catch (Exception ex)
             {

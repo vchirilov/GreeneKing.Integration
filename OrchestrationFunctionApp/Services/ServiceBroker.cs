@@ -1,5 +1,6 @@
 ﻿using Azure.Messaging.ServiceBus;
 using Google.Protobuf;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using OrchestrationFunctionApp.Functions;
@@ -16,16 +17,20 @@ namespace OrchestrationFunctionApp.Services
     public class ServiceBroker: IServiceBroker
     {
         private readonly ILogger<ServiceBroker> _logger;
-        private readonly ServiceBusSettings _serviceBusSettings;
+        private readonly ServiceBusSettings _serviceBusSettings;        
+        private readonly IConfiguration _configuration;
+        private readonly int _delay;
         private IList<ServiceBusReceivedMessage> _messages = new List<ServiceBusReceivedMessage>();
         private IList<string> _exceptions = new List<string>();
 
-        public ServiceBroker(ILogger<ServiceBroker> logger, IOptions<ServiceBusSettings> serviceBusSettings)
+        public ServiceBroker(ILogger<ServiceBroker> logger, IOptions<ServiceBusSettings> serviceBusSettings, IConfiguration configuration)
         {
             _logger = logger;
             _serviceBusSettings = serviceBusSettings.Value;
+            _configuration = configuration;
 
             _logger.LogWarning($"Queue defined in configuration is [{_serviceBusSettings.QueueName}]");
+            _delay = int.TryParse(_configuration[ConfigurationKeys.Pause], out int delay) ? delay : 3000;
         }
 
         public async Task PublishAsync(object message)
@@ -47,7 +52,7 @@ namespace OrchestrationFunctionApp.Services
                 queueProcessor.ProcessErrorAsync += MessageErrorHandler;
                 
                 await queueProcessor.StartProcessingAsync();
-                await Task.Delay(3000);
+                await Task.Delay(_delay);
                 await queueProcessor.StopProcessingAsync();
 
                 return new MessageResponse { Messages = _messages, Errors = _exceptions };                
