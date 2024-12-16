@@ -15,5 +15,7 @@ public partial class MsgEvent
 
     public string Action { get; set; }
 
+    public string Payload { get; set; }
+
     public bool? Processed { get; set; }
 }

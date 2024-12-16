@@ -26,9 +26,17 @@ namespace OrchestrationFunctionApp.Functions
             [ServiceBusTrigger("sbq-event-json-inline", Connection = "ServiceBusConnectionString")] ServiceBusReceivedMessage message,
             ILogger log)
         {
-            _serviceBroker.SaveMessageAsync(message).Wait();
+            try
+            {
+                _logger.LogInformation($"save-json-inline-messages: {message}");
 
-            log.LogInformation($"save-json-inline-messages: {message}");
+                _serviceBroker.SaveMessageAsync(message).Wait();
+            }
+            catch (Exception ex) 
+            {
+                _logger.LogError($"Function [save-json-inline-messages] has failed with error message: {ex.Message}");
+            }
+            
         }
     }
 }

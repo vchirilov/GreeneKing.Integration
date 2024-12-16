@@ -1,9 +1,11 @@
 ﻿using Azure.Messaging.ServiceBus;
 using Google.Protobuf;
+using Google.Protobuf.WellKnownTypes;
 using Microsoft.Azure.ServiceBus;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using Newtonsoft.Json;
 using OrchestrationFunctionApp.Functions;
 using OrchestrationFunctionApp.Models;
 using OrchestrationFunctionApp.Options;
@@ -90,16 +92,20 @@ namespace OrchestrationFunctionApp.Services
 
         public async Task SaveMessageAsync(ServiceBusReceivedMessage message)
         {
-            MsgInlineJsonModel model = new MsgInlineJsonModel();
+            MsgInlineJsonModel model = new();
             model.SequenceNumber = message.SequenceNumber;
             model.MessageId = message.MessageId;
             model.EnqueuedTime = message.EnqueuedTime.UtcDateTime;
-            model.Payload = Encoding.UTF8.GetString(message.Body);
+
+            var body = Encoding.UTF8.GetString(message.Body);
+            ServiceBusMessageObject root = JsonConvert.DeserializeObject<ServiceBusMessageObject>(body);
+
+            model.Action = root.Action;
+            model.Payload = Convert.ToString(root.Payload);
 
             var dbEntity = (MsgInlineJson)model;
             _dbContext.MsgInlineJsons.Add(dbEntity);
             await _dbContext.SaveChangesAsync();
-        }
-        
+        }        
     }
 }
