@@ -30,7 +30,7 @@ public partial class GreeeKingMessageBusContext : DbContext
     {
         modelBuilder.Entity<MsgCsvFile>(entity =>
         {
-            entity.HasKey(e => e.Id).HasName("PK__MsgCsvFi__3214EC07ACC1226E");
+            //entity.HasKey(e => e.Id).HasName("PK__MsgCsvFi__3214EC07ACC1226E");
 
             entity.ToTable("MsgCsvFile", "msgqueue");
 
@@ -47,7 +47,7 @@ public partial class GreeeKingMessageBusContext : DbContext
 
         modelBuilder.Entity<MsgEvent>(entity =>
         {
-            entity.HasKey(e => e.Id).HasName("PK__MsgEvent__3214EC076E763819");
+            //entity.HasKey(e => e.Id).HasName("PK__MsgEvent__3214EC076E763819");
 
             entity.ToTable("MsgEvent", "msgqueue");
 
@@ -64,7 +64,7 @@ public partial class GreeeKingMessageBusContext : DbContext
 
         modelBuilder.Entity<MsgInlineJson>(entity =>
         {
-            entity.HasKey(e => e.Id).HasName("PK__MsgInlin__3214EC077F52A316");
+            //entity.HasKey(e => e.Id).HasName("PK__MsgInlin__3214EC077F52A316");
 
             entity.ToTable("MsgInlineJson", "msgqueue");
 
@@ -81,7 +81,7 @@ public partial class GreeeKingMessageBusContext : DbContext
 
         modelBuilder.Entity<MsgJsonFile>(entity =>
         {
-            entity.HasKey(e => e.Id).HasName("PK__MsgJsonF__3214EC07C355C7E0");
+            //entity.HasKey(e => e.Id).HasName("PK__MsgJsonF__3214EC07C355C7E0");
 
             entity.ToTable("MsgJsonFile", "msgqueue");
 
@@ -98,7 +98,7 @@ public partial class GreeeKingMessageBusContext : DbContext
 
         modelBuilder.Entity<MsgXmlFile>(entity =>
         {
-            entity.HasKey(e => e.Id).HasName("PK__MsgXmlFi__3214EC073F9C79DE");
+            //entity.HasKey(e => e.Id).HasName("PK__MsgXmlFi__3214EC073F9C79DE");
 
             entity.ToTable("MsgXmlFile", "msgqueue");
 
