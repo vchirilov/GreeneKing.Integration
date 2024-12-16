@@ -14,6 +14,7 @@ using System.Text;
 using OrchestrationFunctionApp.Services;
 using System.Linq;
 using Microsoft.Extensions.Configuration;
+using OrchestrationFunctionApp.Persistence;
 
 namespace OrchestrationFunctionApp.Functions
 {
@@ -22,12 +23,13 @@ namespace OrchestrationFunctionApp.Functions
         private readonly ILogger<QueuePayloadRetreiver> _logger;
         private readonly IServiceBroker _serviceBroker;
         private readonly IConfiguration _configuration;
+        
 
         public QueuePayloadRetreiver(ILogger<QueuePayloadRetreiver> logger, IServiceBroker serviceBroker, IConfiguration configuration)
         {
             _logger = logger;
             _serviceBroker = serviceBroker;
-            _configuration = configuration;
+            _configuration = configuration;           
         }
 
         [FunctionName("queue-payload-retreiver")]

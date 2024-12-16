@@ -26,10 +26,6 @@ public partial class GreeeKingMessageBusContext : DbContext
 
     public virtual DbSet<MsgXmlFile> MsgXmlFiles { get; set; }
 
-    protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-#warning To protect potentially sensitive information in your connection string, you should move it out of source code. You can avoid scaffolding the connection string by using the Name= syntax to read it from configuration - see https://go.microsoft.com/fwlink/?linkid=2131148. For more guidance on storing connection strings, see http://go.microsoft.com/fwlink/?LinkId=723263.
-        => optionsBuilder.UseSqlServer("Data Source=51.12.52.30;Initial Catalog=GreeeKingMessageBus;Persist Security Info=True;User ID=sa;Password=spartak_1; Encrypt=False");
-
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.Entity<MsgCsvFile>(entity =>
@@ -38,7 +34,7 @@ public partial class GreeeKingMessageBusContext : DbContext
 
             entity.ToTable("MsgCsvFile", "msgqueue");
 
-            entity.Property(e => e.Id).ValueGeneratedNever();
+            entity.Property(e => e.Id).HasColumnName("ID");
             entity.Property(e => e.Action)
                 .HasMaxLength(250)
                 .IsUnicode(false);
@@ -55,7 +51,7 @@ public partial class GreeeKingMessageBusContext : DbContext
 
             entity.ToTable("MsgEvent", "msgqueue");
 
-            entity.Property(e => e.Id).ValueGeneratedNever();
+            entity.Property(e => e.Id).HasColumnName("ID");
             entity.Property(e => e.Action)
                 .HasMaxLength(250)
                 .IsUnicode(false);
@@ -72,7 +68,7 @@ public partial class GreeeKingMessageBusContext : DbContext
 
             entity.ToTable("MsgInlineJson", "msgqueue");
 
-            entity.Property(e => e.Id).ValueGeneratedNever();
+            entity.Property(e => e.Id).HasColumnName("ID");
             entity.Property(e => e.Action)
                 .HasMaxLength(250)
                 .IsUnicode(false);
@@ -89,7 +85,7 @@ public partial class GreeeKingMessageBusContext : DbContext
 
             entity.ToTable("MsgJsonFile", "msgqueue");
 
-            entity.Property(e => e.Id).ValueGeneratedNever();
+            entity.Property(e => e.Id).HasColumnName("ID");
             entity.Property(e => e.Action)
                 .HasMaxLength(250)
                 .IsUnicode(false);
@@ -106,7 +102,7 @@ public partial class GreeeKingMessageBusContext : DbContext
 
             entity.ToTable("MsgXmlFile", "msgqueue");
 
-            entity.Property(e => e.Id).ValueGeneratedNever();
+            entity.Property(e => e.Id).HasColumnName("ID");
             entity.Property(e => e.Action)
                 .HasMaxLength(250)
                 .IsUnicode(false);

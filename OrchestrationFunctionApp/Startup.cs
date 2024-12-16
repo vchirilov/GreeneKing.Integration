@@ -1,7 +1,9 @@
 ﻿using Microsoft.Azure.Functions.Extensions.DependencyInjection;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using OrchestrationFunctionApp.Options;
+using OrchestrationFunctionApp.Persistence;
 using OrchestrationFunctionApp.Services;
 using System;
 using System.Collections.Generic;
@@ -27,6 +29,13 @@ namespace OrchestrationFunctionApp
                 {
                     configuration.GetSection("ServiceBus").Bind(settings);
                 });
+            
+            builder.Services.AddDbContext<GreeeKingMessageBusContext>(options =>
+            {
+                //var config = builder.Configuration;
+                //var connectionString = config.GetConnectionString("GreeneKingConnectionString");
+                options.UseSqlServer("Data Source=51.12.52.30;Initial Catalog=GreeeKingMessageBus;Persist Security Info=True;User ID=sa;Password=spartak_1; Encrypt=False");
+            });
         }
 
         public override void ConfigureAppConfiguration(IFunctionsConfigurationBuilder builder)
