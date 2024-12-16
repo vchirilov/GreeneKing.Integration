@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace OrchestrationFunctionApp;
+namespace OrchestrationFunctionApp.Persistence.Entities;
 
-public partial class MsgInlineJson
+public partial class MsgEvent
 {
     public int Id { get; set; }
 
@@ -14,8 +14,6 @@ public partial class MsgInlineJson
     public DateTime? EnqueuedTime { get; set; }
 
     public string Action { get; set; }
-
-    public string Payload { get; set; }
 
     public bool? Processed { get; set; }
 }

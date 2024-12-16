@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using Microsoft.EntityFrameworkCore;
-using OrchestrationFunctionApp;
+using OrchestrationFunctionApp.Persistence.Entities;
 
 namespace OrchestrationFunctionApp.Persistence;
 

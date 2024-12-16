@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace OrchestrationFunctionApp;
+namespace OrchestrationFunctionApp.Persistence.Entities;
 
 public partial class MsgXmlFile
 {
