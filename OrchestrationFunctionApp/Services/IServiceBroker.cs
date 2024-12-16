@@ -1,4 +1,5 @@
-﻿using OrchestrationFunctionApp.Models;
+﻿using Azure.Messaging.ServiceBus;
+using OrchestrationFunctionApp.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -10,7 +11,7 @@ namespace OrchestrationFunctionApp.Services
     public interface IServiceBroker
     {
         Task PublishAsync(object message);
-
         Task<MessageResponse> RetrieveAsync(string queue);
+        Task SaveMessageAsync(ServiceBusReceivedMessage message);
     }
 }

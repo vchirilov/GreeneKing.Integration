@@ -1,5 +1,6 @@
 ﻿using Azure.Messaging.ServiceBus;
 using Google.Protobuf;
+using Microsoft.Azure.ServiceBus;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
@@ -10,7 +11,9 @@ using OrchestrationFunctionApp.Persistence;
 using OrchestrationFunctionApp.Persistence.Entities;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -73,7 +76,7 @@ namespace OrchestrationFunctionApp.Services
         {
             //var body = args.Message.Body.ToString();
             _messages.Add(args.Message);
-            await SaveMessageAsync(args);
+
             //Complete the message, message is deleted from the queue
             await args.CompleteMessageAsync(args.Message);
         }
@@ -85,9 +88,14 @@ namespace OrchestrationFunctionApp.Services
             await Task.CompletedTask;
         }
 
-        private async Task SaveMessageAsync(ProcessMessageEventArgs args)
+        public async Task SaveMessageAsync(ServiceBusReceivedMessage message)
         {
-            MsgInlineJsonModel model = new MsgInlineJsonModel() { Action = "test", EnqueuedTime = DateTime.Now, MessageId = "1", Payload = "some data", SequenceNumber = 1 };
+            MsgInlineJsonModel model = new MsgInlineJsonModel();
+            model.SequenceNumber = message.SequenceNumber;
+            model.MessageId = message.MessageId;
+            model.EnqueuedTime = message.EnqueuedTime.UtcDateTime;
+            model.Payload = Encoding.UTF8.GetString(message.Body);
+
             var dbEntity = (MsgInlineJson)model;
             _dbContext.MsgInlineJsons.Add(dbEntity);
             await _dbContext.SaveChangesAsync();
