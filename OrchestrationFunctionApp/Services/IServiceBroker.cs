@@ -12,6 +12,6 @@ namespace OrchestrationFunctionApp.Services
     {
         Task PublishAsync(object message);
         Task<MessageResponse> RetrieveAsync(string queue);
-        Task SaveMessageAsync(ServiceBusReceivedMessage message);
+        Task SaveMessageAsync<T>(ServiceBusReceivedMessage message) where T : MsgBaseModel, new();
     }
 }

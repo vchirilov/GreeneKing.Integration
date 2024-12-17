@@ -90,22 +90,27 @@ namespace OrchestrationFunctionApp.Services
             await Task.CompletedTask;
         }
 
-        public async Task SaveMessageAsync(ServiceBusReceivedMessage message)
+        public async Task SaveMessageAsync<T>(ServiceBusReceivedMessage message) where T: MsgBaseModel, new()
         {
-            MsgInlineJsonModel model = new();
-            model.SequenceNumber = message.SequenceNumber;
-            model.MessageId = message.MessageId;
-            model.EnqueuedTime = message.EnqueuedTime.UtcDateTime;
+            T baseModel = new();
+            baseModel.SequenceNumber = message.SequenceNumber;
+            baseModel.MessageId = message.MessageId;
+            baseModel.EnqueuedTime = message.EnqueuedTime.UtcDateTime;
 
             var body = Encoding.UTF8.GetString(message.Body);
             ServiceBusMessageObject root = JsonConvert.DeserializeObject<ServiceBusMessageObject>(body);
 
-            model.Action = root.Action;
-            model.Payload = Convert.ToString(root.Payload);
-
-            var dbEntity = (MsgInlineJson)model;
-            _dbContext.MsgInlineJsons.Add(dbEntity);
+            baseModel.Action = root.Action;
+            baseModel.Payload = Convert.ToString(root.Payload);
+                        
+            if (typeof(T) == typeof(MsgInlineJsonModel))
+            {                
+                var model = baseModel as MsgInlineJsonModel;
+                var dbEntity = (MsgInlineJson)model;
+                _dbContext.MsgInlineJsons.Add(dbEntity);
+            }            
             await _dbContext.SaveChangesAsync();
+
         }        
     }
 }

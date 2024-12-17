@@ -8,20 +8,8 @@ using System.Threading.Tasks;
 
 namespace OrchestrationFunctionApp.Models
 {
-    public  class MsgInlineJsonModel
+    public  class MsgInlineJsonModel : MsgBaseModel
     {
-        public long? SequenceNumber { get; set; }
-
-        public string MessageId { get; set; }
-
-        public DateTime? EnqueuedTime { get; set; }
-
-        public string Action { get; set; }
-
-        public string Payload { get; set; }
-
-        public bool? Processed { get; set; }
-
         public static explicit operator MsgInlineJson(MsgInlineJsonModel model)
         {
             return new MsgInlineJson

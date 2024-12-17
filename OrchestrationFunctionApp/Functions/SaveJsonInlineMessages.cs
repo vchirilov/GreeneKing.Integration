@@ -5,6 +5,7 @@ using Microsoft.Azure.WebJobs.Host;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using OrchestrationFunctionApp.Models;
+using OrchestrationFunctionApp.Persistence.Entities;
 using OrchestrationFunctionApp.Services;
 
 namespace OrchestrationFunctionApp.Functions
@@ -30,7 +31,7 @@ namespace OrchestrationFunctionApp.Functions
             {
                 _logger.LogInformation($"save-json-inline-messages: {message}");
 
-                _serviceBroker.SaveMessageAsync(message).Wait();
+                _serviceBroker.SaveMessageAsync<MsgInlineJsonModel>(message).Wait();
             }
             catch (Exception ex) 
             {
