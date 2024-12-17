@@ -94,8 +94,13 @@ namespace OrchestrationFunctionApp.Services
                 _dbContext.MsgInlineJsons.Add(dbEntity);                
             }            
 
-            await _dbContext.SaveChangesAsync();                        
-            await PublishAsync(new MsgJmsModel { Action = baseModel.Action, MessageId = baseModel.MessageId });
+            var affectedRows = await _dbContext.SaveChangesAsync();
+            
+            //Make sure that the record has been added to database table
+            if (affectedRows > 0)
+            {
+                await PublishAsync(new MsgJmsModel { Action = baseModel.Action, MessageId = baseModel.MessageId });
+            }
         }
 
         private async Task SendMessageAsync<T>(ServiceBusSender sender, T model)
