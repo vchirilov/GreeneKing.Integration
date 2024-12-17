@@ -39,16 +39,16 @@ namespace OrchestrationFunctionApp.Services
             _configuration = configuration;
             _dbContext = dbContext;
 
-            _logger.LogWarning($"Queue defined in configuration is [{_serviceBusSettings.QueueName}]");
+            _logger.LogWarning($"Queue defined in configuration is [{_serviceBusSettings.JmsQueueName}]");
             _delay = int.TryParse(_configuration[ConfigurationKeys.Pause], out int delay) ? delay : 3000;
         }
 
-        public async Task PublishAsync(object message)
+        public async Task PublishAsync<T>(T model)
         {
             var serviceBrokerClient = new ServiceBusClient(_serviceBusSettings.ConnectionString);
-            var queueSender = serviceBrokerClient.CreateSender(_serviceBusSettings.QueueName);
+            var sender = serviceBrokerClient.CreateSender(_serviceBusSettings.JmsQueueName);
 
-            await Task.CompletedTask;
+            await SendMessageAsync(sender, model);
         }
 
         public async Task<MessageResponse> RetrieveAsync(string queue)
@@ -72,23 +72,7 @@ namespace OrchestrationFunctionApp.Services
                 _logger.LogError(ex.Message);
                 return await Task.FromResult(new MessageResponse());
             }            
-        }
-
-        private async Task MessageHandler(ProcessMessageEventArgs args)
-        {
-            //var body = args.Message.Body.ToString();
-            _messages.Add(args.Message);
-
-            //Complete the message, message is deleted from the queue
-            await args.CompleteMessageAsync(args.Message);
-        }
-
-        private async Task MessageErrorHandler(ProcessErrorEventArgs args)
-        {
-            _logger.LogError(args.Exception.Message);
-            _exceptions.Add(args.Exception.Message);
-            await Task.CompletedTask;
-        }
+        }      
 
         public async Task SaveMessageAsync<T>(ServiceBusReceivedMessage message) where T: MsgBaseModel, new()
         {
@@ -107,10 +91,35 @@ namespace OrchestrationFunctionApp.Services
             {                
                 var model = baseModel as MsgInlineJsonModel;
                 var dbEntity = (MsgInlineJson)model;
-                _dbContext.MsgInlineJsons.Add(dbEntity);
+                _dbContext.MsgInlineJsons.Add(dbEntity);                
             }            
-            await _dbContext.SaveChangesAsync();
 
-        }        
+            await _dbContext.SaveChangesAsync();                        
+            await PublishAsync(new MsgJmsModel { Action = baseModel.Action, MessageId = baseModel.MessageId });
+        }
+
+        private async Task SendMessageAsync<T>(ServiceBusSender sender, T model)
+        {
+            var content = JsonConvert.SerializeObject(model);
+            ServiceBusMessage message = new ServiceBusMessage(content);
+            
+            await sender.SendMessageAsync(message);
+        }
+
+        private async Task MessageHandler(ProcessMessageEventArgs args)
+        {
+            //var body = args.Message.Body.ToString();
+            _messages.Add(args.Message);
+
+            //Complete the message, message is deleted from the queue
+            await args.CompleteMessageAsync(args.Message);
+        }
+
+        private async Task MessageErrorHandler(ProcessErrorEventArgs args)
+        {
+            _logger.LogError(args.Exception.Message);
+            _exceptions.Add(args.Exception.Message);
+            await Task.CompletedTask;
+        }
     }
 }

@@ -38,7 +38,7 @@ namespace OrchestrationFunctionApp.Functions
 
                 // Initialize queue sender            
                 ServiceBusClient serviceBusClient = new ServiceBusClient(_serviceBusSettings.ConnectionString);
-                var pipelineEventQueueSender = serviceBusClient.CreateSender(_serviceBusSettings.QueueName);
+                var pipelineEventQueueSender = serviceBusClient.CreateSender(_serviceBusSettings.JmsQueueName);
 
                 // Deserialize payload into PipelineDescriptor
                 PipelineDescriptor pipelineDescriptor = JsonConvert.DeserializeObject<PipelineDescriptor>(requestBody);

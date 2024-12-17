@@ -10,7 +10,7 @@ namespace OrchestrationFunctionApp.Services
 {
     public interface IServiceBroker
     {
-        Task PublishAsync(object message);
+        Task PublishAsync<T>(T model);
         Task<MessageResponse> RetrieveAsync(string queue);
         Task SaveMessageAsync<T>(ServiceBusReceivedMessage message) where T : MsgBaseModel, new();
     }
