@@ -98,10 +98,10 @@ namespace OrchestrationFunctionApp.Services
             baseModel.EnqueuedTime = message.EnqueuedTime.UtcDateTime;
 
             var body = Encoding.UTF8.GetString(message.Body);
-            ServiceBusMessageObject root = JsonConvert.DeserializeObject<ServiceBusMessageObject>(body);
+            var serviceBusMessageObject = JsonConvert.DeserializeObject<ServiceBusMessageObject>(body);
 
-            baseModel.Action = root.Action;
-            baseModel.Payload = Convert.ToString(root.Payload);
+            baseModel.Action = serviceBusMessageObject.Action;
+            baseModel.Payload = Convert.ToString(serviceBusMessageObject.Payload);
                         
             if (typeof(T) == typeof(MsgInlineJsonModel))
             {                

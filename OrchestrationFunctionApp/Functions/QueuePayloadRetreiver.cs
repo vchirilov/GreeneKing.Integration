@@ -32,7 +32,7 @@ namespace OrchestrationFunctionApp.Functions
             _configuration = configuration;           
         }
 
-        [FunctionName("queue-payload-retreiver")]
+        //[FunctionName("queue-payload-retreiver")]
         public async Task<IActionResult> Run(
             [HttpTrigger(AuthorizationLevel.Function, "get", "post", Route = null)] HttpRequest req,
             ILogger log)
