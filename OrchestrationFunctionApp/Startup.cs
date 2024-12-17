@@ -32,9 +32,9 @@ namespace OrchestrationFunctionApp
             
             builder.Services.AddDbContext<GreeeKingMessageBusContext>(options =>
             {
-                //var config = builder.Configuration;
-                //var connectionString = config.GetConnectionString("GreeneKingConnectionString");
-                options.UseSqlServer("Data Source=51.12.52.30;Initial Catalog=GreeeKingMessageBus;Persist Security Info=True;User ID=sa;Password=spartak_1; Encrypt=False");
+                var context = builder.GetContext();
+                string dbConnectionString = context.Configuration.GetConnectionString("Database");
+                options.UseSqlServer(dbConnectionString);
             });
         }
 

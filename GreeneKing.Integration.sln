@@ -5,6 +5,8 @@ VisualStudioVersion = 17.11.35222.181
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "OrchestrationFunctionApp", "OrchestrationFunctionApp\OrchestrationFunctionApp.csproj", "{564D1858-9B86-4CBF-8B58-D0248F1D3174}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OrchestrationFunctionApp.UnitTests", "OrchestrationFunctionApp.UnitTests\OrchestrationFunctionApp.UnitTests.csproj", "{9DD5B901-C8BB-42A4-BBFF-CDF836063D37}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -15,6 +17,10 @@ Global
 		{564D1858-9B86-4CBF-8B58-D0248F1D3174}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{564D1858-9B86-4CBF-8B58-D0248F1D3174}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{564D1858-9B86-4CBF-8B58-D0248F1D3174}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9DD5B901-C8BB-42A4-BBFF-CDF836063D37}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9DD5B901-C8BB-42A4-BBFF-CDF836063D37}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9DD5B901-C8BB-42A4-BBFF-CDF836063D37}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9DD5B901-C8BB-42A4-BBFF-CDF836063D37}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
