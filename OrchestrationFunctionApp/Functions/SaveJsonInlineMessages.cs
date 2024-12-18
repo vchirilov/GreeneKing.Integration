@@ -22,7 +22,7 @@ namespace OrchestrationFunctionApp.Functions
         }
 
 
-        [FunctionName("save-json-inline-messages")]
+        [FunctionName("save-json-inline")]
         public void Run(
             [ServiceBusTrigger("sbq-event-json-inline", Connection = "ServiceBusConnectionString")] ServiceBusReceivedMessage message,
             ILogger log)
