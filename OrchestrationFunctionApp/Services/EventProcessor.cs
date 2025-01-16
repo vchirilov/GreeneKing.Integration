@@ -21,9 +21,9 @@ using System.Threading.Tasks;
 
 namespace OrchestrationFunctionApp.Services
 {
-    public class ServiceBroker: IServiceBroker
+    public class EventProcessor: IEventProcessor
     {
-        private readonly ILogger<ServiceBroker> _logger;
+        private readonly ILogger<EventProcessor> _logger;
         private readonly ServiceBusSettings _serviceBusSettings;        
         private readonly IConfiguration _configuration;
         private readonly GreeeKingMessageBusContext _dbContext;
@@ -32,7 +32,7 @@ namespace OrchestrationFunctionApp.Services
         private IList<string> _exceptions = new List<string>();
         
 
-        public ServiceBroker(ILogger<ServiceBroker> logger, IOptions<ServiceBusSettings> serviceBusSettings, IConfiguration configuration, GreeeKingMessageBusContext dbContext)
+        public EventProcessor(ILogger<EventProcessor> logger, IOptions<ServiceBusSettings> serviceBusSettings, IConfiguration configuration, GreeeKingMessageBusContext dbContext)
         {
             _logger = logger;
             _serviceBusSettings = serviceBusSettings.Value;

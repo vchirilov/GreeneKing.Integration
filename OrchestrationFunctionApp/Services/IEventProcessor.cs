@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace OrchestrationFunctionApp.Services
 {
-    public interface IServiceBroker
+    public interface IEventProcessor
     {
         Task PublishAsync<T>(T model);
         Task<MessageResponse> RetrieveAsync(string queue);

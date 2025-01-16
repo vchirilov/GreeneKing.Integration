@@ -13,9 +13,9 @@ namespace OrchestrationFunctionApp.Functions
     public class SaveJsonInlineMessages
     {
         private readonly ILogger<SaveJsonInlineMessages> _logger;
-        private readonly IServiceBroker _serviceBroker;
+        private readonly IEventProcessor _serviceBroker;
 
-        public SaveJsonInlineMessages(ILogger<SaveJsonInlineMessages> logger, IServiceBroker serviceBroker)
+        public SaveJsonInlineMessages(ILogger<SaveJsonInlineMessages> logger, IEventProcessor serviceBroker)
         {
             _logger = logger;
             _serviceBroker = serviceBroker;

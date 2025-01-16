@@ -21,11 +21,11 @@ namespace OrchestrationFunctionApp.Functions
     public class QueuePayloadRetreiver
     {
         private readonly ILogger<QueuePayloadRetreiver> _logger;
-        private readonly IServiceBroker _serviceBroker;
+        private readonly IEventProcessor _serviceBroker;
         private readonly IConfiguration _configuration;
         
 
-        public QueuePayloadRetreiver(ILogger<QueuePayloadRetreiver> logger, IServiceBroker serviceBroker, IConfiguration configuration)
+        public QueuePayloadRetreiver(ILogger<QueuePayloadRetreiver> logger, IEventProcessor serviceBroker, IConfiguration configuration)
         {
             _logger = logger;
             _serviceBroker = serviceBroker;
