@@ -72,43 +72,45 @@ namespace OrchestrationFunctionApp.Services
                 _logger.LogError(ex.Message);
                 return await Task.FromResult(new MessageResponse());
             }            
-        }      
+        }
 
-        public async Task SaveMessageAsync<T>(ServiceBusReceivedMessage message) where T: MsgBaseModel, new()
+        public async Task SaveMessageAsync<T>(ServiceBusReceivedMessage message) where T : MsgBaseModel, new()
         {
-            T baseModel = new();
-            baseModel.SequenceNumber = message.SequenceNumber;
-            baseModel.MessageId = message.MessageId;
-            baseModel.EnqueuedTime = message.EnqueuedTime.UtcDateTime;
+            // Initialize the model and populate common properties
+            var model = new T
+            {
+                SequenceNumber = message.SequenceNumber,
+                MessageId = message.MessageId,
+                EnqueuedTime = message.EnqueuedTime.UtcDateTime
+            };
 
+            // Deserialize message body
             var body = Encoding.UTF8.GetString(message.Body);
             var serviceBusMessageObject = JsonConvert.DeserializeObject<ServiceBusMessageObject>(body);
 
-            baseModel.PipelineAction = serviceBusMessageObject.PipelineAction;
-            baseModel.OrchestrationAction = serviceBusMessageObject.OrchestrationAction;
-            baseModel.Payload = Convert.ToString(serviceBusMessageObject.Payload);
+            model.PipelineAction = serviceBusMessageObject.PipelineAction;
+            model.OrchestrationAction = serviceBusMessageObject.OrchestrationAction;
+            model.Payload = Convert.ToString(serviceBusMessageObject.Payload);
 
-            var affectedRows = 0;
-
-            if (typeof(T) == typeof(MsgInlineJsonModel))
-            {                
-                var model = baseModel as MsgInlineJsonModel;
-                var dbEntity = (MsgInlineJson)model;
-                affectedRows = await _repository.SaveInlineJsonEvent(dbEntity);                
-            }
-            else if (typeof(T) == typeof(MsgEmptyEventModel))
+            // Save the model and handle specific types
+            var affectedRows = model switch
             {
-                var model = baseModel as MsgEmptyEventModel;
-                var dbEntity = (MsgEmptyEvent)model;
-                affectedRows = await _repository.SaveEmptyEvent(dbEntity);
-            }
+                MsgInlineJsonModel inlineJsonModel => await _repository.SaveInlineJsonEvent((MsgInlineJson)inlineJsonModel),
+                MsgEmptyEventModel emptyEventModel => await _repository.SaveEmptyEvent((MsgEmptyEvent)emptyEventModel),
+                _ => throw new NotSupportedException($"Unsupported model type: {typeof(T)}")
+            };
 
-            //Make sure that the record has been added to database table
+            // Publish message if database operation succeeded
             if (affectedRows > 0)
             {
-                await PublishAsync(new MsgJmsModel { Action = baseModel.PipelineAction, MessageId = baseModel.MessageId });
+                await PublishAsync(new MsgJmsModel
+                {
+                    Action = model.PipelineAction,
+                    MessageId = model.MessageId
+                });
             }
         }
+
 
         private async Task SendMessageAsync<T>(ServiceBusSender sender, T model)
         {
