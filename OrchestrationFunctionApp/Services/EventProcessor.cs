@@ -26,18 +26,18 @@ namespace OrchestrationFunctionApp.Services
         private readonly ILogger<EventProcessor> _logger;
         private readonly ServiceBusSettings _serviceBusSettings;        
         private readonly IConfiguration _configuration;
-        private readonly GreeeKingMessageBusContext _dbContext;
+        private readonly IRepository _repository;
         private readonly int _delay;
         private IList<ServiceBusReceivedMessage> _messages = new List<ServiceBusReceivedMessage>();
         private IList<string> _exceptions = new List<string>();
         
 
-        public EventProcessor(ILogger<EventProcessor> logger, IOptions<ServiceBusSettings> serviceBusSettings, IConfiguration configuration, GreeeKingMessageBusContext dbContext)
+        public EventProcessor(ILogger<EventProcessor> logger, IOptions<ServiceBusSettings> serviceBusSettings, IConfiguration configuration, IRepository repository)
         {
             _logger = logger;
             _serviceBusSettings = serviceBusSettings.Value;
             _configuration = configuration;
-            _dbContext = dbContext;
+            _repository = repository;
 
             _logger.LogWarning($"Queue defined in configuration is [{_serviceBusSettings.JmsQueueName}]");
             _delay = int.TryParse(_configuration[ConfigurationKeys.Pause], out int delay) ? delay : 3000;
@@ -92,16 +92,14 @@ namespace OrchestrationFunctionApp.Services
             {                
                 var model = baseModel as MsgInlineJsonModel;
                 var dbEntity = (MsgInlineJson)model;
-                _dbContext.MsgInlineJsons.Add(dbEntity);                
-            }            
+                var affectedRows = await _repository.SaveInlineJsonEvent(dbEntity);
 
-            var affectedRows = await _dbContext.SaveChangesAsync();
-            
-            //Make sure that the record has been added to database table
-            if (affectedRows > 0)
-            {
-                await PublishAsync(new MsgJmsModel { Action = baseModel.PipelineAction, MessageId = baseModel.MessageId });
-            }
+                //Make sure that the record has been added to database table
+                if (affectedRows > 0)
+                {
+                    await PublishAsync(new MsgJmsModel { Action = baseModel.PipelineAction, MessageId = baseModel.MessageId });
+                }
+            }            
         }
 
         private async Task SendMessageAsync<T>(ServiceBusSender sender, T model)

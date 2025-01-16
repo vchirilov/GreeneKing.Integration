@@ -21,6 +21,7 @@ namespace OrchestrationFunctionApp
         {
             builder.Services.AddLogging();
             builder.Services.AddScoped<IHttpService, HttpService>();
+            builder.Services.AddTransient<IRepository, Repository>();
             builder.Services.AddTransient<IEventProcessor, EventProcessor>();
             builder.Services.AddHttpClient();
 
