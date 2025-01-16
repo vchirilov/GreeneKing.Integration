@@ -14,7 +14,9 @@ namespace OrchestrationFunctionApp.Models
 
         public DateTime? EnqueuedTime { get; set; }
 
-        public string Action { get; set; }
+        public string PipelineAction { get; set; }
+        
+        public string OrchestrationAction { get; set; }
 
         public string Payload { get; set; }
 

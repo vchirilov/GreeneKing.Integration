@@ -16,9 +16,9 @@ public partial class GreeeKingMessageBusContext : DbContext
     {
     }
 
-    public virtual DbSet<MsgCsvFile> MsgCsvFiles { get; set; }
+    public virtual DbSet<MsgFlatFile> MsgFlatFiles { get; set; }
 
-    public virtual DbSet<MsgEvent> MsgEvents { get; set; }
+    public virtual DbSet<MsgEmptyEvent> MsgEmptyEvents { get; set; }
 
     public virtual DbSet<MsgInlineJson> MsgInlineJsons { get; set; }
 
@@ -28,14 +28,17 @@ public partial class GreeeKingMessageBusContext : DbContext
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
-        modelBuilder.Entity<MsgCsvFile>(entity =>
+        modelBuilder.Entity<MsgFlatFile>(entity =>
         {
             //entity.HasKey(e => e.Id).HasName("PK__MsgCsvFi__3214EC07ACC1226E");
 
-            entity.ToTable("MsgCsvFile", "msgqueue");
+            entity.ToTable("MsgFlatFile", "msgqueue");
 
             entity.Property(e => e.Id).HasColumnName("ID");
-            entity.Property(e => e.Action)
+            entity.Property(e => e.PipelineAction)
+                .HasMaxLength(250)
+                .IsUnicode(false);
+            entity.Property(e => e.OrchestrationAction)
                 .HasMaxLength(250)
                 .IsUnicode(false);
             entity.Property(e => e.MessageId)
@@ -45,14 +48,17 @@ public partial class GreeeKingMessageBusContext : DbContext
             entity.Property(e => e.Processed).HasDefaultValueSql("((0))");
         });
 
-        modelBuilder.Entity<MsgEvent>(entity =>
+        modelBuilder.Entity<MsgEmptyEvent>(entity =>
         {
             //entity.HasKey(e => e.Id).HasName("PK__MsgEvent__3214EC076E763819");
 
-            entity.ToTable("MsgEvent", "msgqueue");
+            entity.ToTable("MsgEmptyEvent", "msgqueue");
 
             entity.Property(e => e.Id).HasColumnName("ID");
-            entity.Property(e => e.Action)
+            entity.Property(e => e.PipelineAction)
+                .HasMaxLength(250)
+                .IsUnicode(false);
+            entity.Property(e => e.OrchestrationAction)
                 .HasMaxLength(250)
                 .IsUnicode(false);
             entity.Property(e => e.MessageId)
@@ -69,7 +75,10 @@ public partial class GreeeKingMessageBusContext : DbContext
             entity.ToTable("MsgInlineJson", "msgqueue");
 
             entity.Property(e => e.Id).HasColumnName("ID");
-            entity.Property(e => e.Action)
+            entity.Property(e => e.PipelineAction)
+                .HasMaxLength(250)
+                .IsUnicode(false);
+            entity.Property(e => e.OrchestrationAction)
                 .HasMaxLength(250)
                 .IsUnicode(false);
             entity.Property(e => e.MessageId)
@@ -86,7 +95,10 @@ public partial class GreeeKingMessageBusContext : DbContext
             entity.ToTable("MsgJsonFile", "msgqueue");
 
             entity.Property(e => e.Id).HasColumnName("ID");
-            entity.Property(e => e.Action)
+            entity.Property(e => e.PipelineAction)
+                .HasMaxLength(250)
+                .IsUnicode(false);
+            entity.Property(e => e.OrchestrationAction)
                 .HasMaxLength(250)
                 .IsUnicode(false);
             entity.Property(e => e.MessageId)
@@ -103,7 +115,10 @@ public partial class GreeeKingMessageBusContext : DbContext
             entity.ToTable("MsgXmlFile", "msgqueue");
 
             entity.Property(e => e.Id).HasColumnName("ID");
-            entity.Property(e => e.Action)
+            entity.Property(e => e.PipelineAction)
+                .HasMaxLength(250)
+                .IsUnicode(false);
+            entity.Property(e => e.OrchestrationAction)
                 .HasMaxLength(250)
                 .IsUnicode(false);
             entity.Property(e => e.MessageId)

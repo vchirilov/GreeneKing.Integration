@@ -9,10 +9,16 @@ namespace OrchestrationFunctionApp.Models
 {    public class ServiceBusMessageObject
     {
         public string Target { get; set; }
-        public string Action { get; set; }
-        public string Platform { get; set; }
+        
+        [JsonProperty("pipeline_action")]
+        public string PipelineAction { get; set; }
+        
+        [JsonProperty("orchestration_action")]
+        public string OrchestrationAction { get; set; }
+        
         [JsonProperty("content-type")]
         public string Contenttype { get; set; }
+        
         public dynamic Payload { get; set; }
     }
 }

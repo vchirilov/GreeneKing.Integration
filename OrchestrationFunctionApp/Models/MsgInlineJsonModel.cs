@@ -17,7 +17,8 @@ namespace OrchestrationFunctionApp.Models
                 SequenceNumber = model.SequenceNumber,
                 MessageId = model.MessageId,
                 EnqueuedTime = model.EnqueuedTime,
-                Action = model.Action,
+                PipelineAction = model.PipelineAction,
+                OrchestrationAction = model.OrchestrationAction,
                 Payload = model.Payload,
                 Processed = model.Processed
             };

@@ -84,7 +84,8 @@ namespace OrchestrationFunctionApp.Services
             var body = Encoding.UTF8.GetString(message.Body);
             var serviceBusMessageObject = JsonConvert.DeserializeObject<ServiceBusMessageObject>(body);
 
-            baseModel.Action = serviceBusMessageObject.Action;
+            baseModel.PipelineAction = serviceBusMessageObject.PipelineAction;
+            baseModel.OrchestrationAction = serviceBusMessageObject.OrchestrationAction;
             baseModel.Payload = Convert.ToString(serviceBusMessageObject.Payload);
                         
             if (typeof(T) == typeof(MsgInlineJsonModel))
@@ -99,7 +100,7 @@ namespace OrchestrationFunctionApp.Services
             //Make sure that the record has been added to database table
             if (affectedRows > 0)
             {
-                await PublishAsync(new MsgJmsModel { Action = baseModel.Action, MessageId = baseModel.MessageId });
+                await PublishAsync(new MsgJmsModel { Action = baseModel.PipelineAction, MessageId = baseModel.MessageId });
             }
         }
 
