@@ -21,25 +21,28 @@ namespace OrchestrationFunctionApp.Services
         }
 
 
-        public Task SaveEmptyEvent(MsgEmptyEvent entity)
+        public async Task<int> SaveEmptyEvent(MsgEmptyEvent entity)
         {
-            throw new NotImplementedException();
+            await _dbContext.MsgEmptyEvents.AddAsync(entity);
+            return await _dbContext.SaveChangesAsync();
         }
 
-        public Task SaveFlatFileEvent(MsgFlatFile entity )
+        public async Task<int> SaveFlatFileEvent(MsgFlatFile entity )
         {
-            throw new NotImplementedException();
+            await _dbContext.MsgFlatFiles.AddAsync(entity);
+            return await _dbContext.SaveChangesAsync();
         }
 
         public async Task<int> SaveInlineJsonEvent(MsgInlineJson entity)
         {
             await _dbContext.MsgInlineJsons.AddAsync(entity);
-            return await _dbContext.SaveChangesAsync();            
+            return await _dbContext.SaveChangesAsync();
         }
 
-        public Task SaveJsonFileEvent(MsgJsonFile entity)
+        public async Task<int> SaveJsonFileEvent(MsgJsonFile entity)
         {
-            throw new NotImplementedException();
+            await _dbContext.MsgJsonFiles.AddAsync(entity);
+            return await _dbContext.SaveChangesAsync();
         }
     }
 }

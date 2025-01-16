@@ -87,19 +87,27 @@ namespace OrchestrationFunctionApp.Services
             baseModel.PipelineAction = serviceBusMessageObject.PipelineAction;
             baseModel.OrchestrationAction = serviceBusMessageObject.OrchestrationAction;
             baseModel.Payload = Convert.ToString(serviceBusMessageObject.Payload);
-                        
+
+            var affectedRows = 0;
+
             if (typeof(T) == typeof(MsgInlineJsonModel))
             {                
                 var model = baseModel as MsgInlineJsonModel;
                 var dbEntity = (MsgInlineJson)model;
-                var affectedRows = await _repository.SaveInlineJsonEvent(dbEntity);
+                affectedRows = await _repository.SaveInlineJsonEvent(dbEntity);                
+            }
+            else if (typeof(T) == typeof(MsgEmptyEventModel))
+            {
+                var model = baseModel as MsgEmptyEventModel;
+                var dbEntity = (MsgEmptyEvent)model;
+                affectedRows = await _repository.SaveEmptyEvent(dbEntity);
+            }
 
-                //Make sure that the record has been added to database table
-                if (affectedRows > 0)
-                {
-                    await PublishAsync(new MsgJmsModel { Action = baseModel.PipelineAction, MessageId = baseModel.MessageId });
-                }
-            }            
+            //Make sure that the record has been added to database table
+            if (affectedRows > 0)
+            {
+                await PublishAsync(new MsgJmsModel { Action = baseModel.PipelineAction, MessageId = baseModel.MessageId });
+            }
         }
 
         private async Task SendMessageAsync<T>(ServiceBusSender sender, T model)

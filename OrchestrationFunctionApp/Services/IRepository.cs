@@ -9,10 +9,10 @@ namespace OrchestrationFunctionApp.Services
 {
     public interface IRepository
     {
-        Task SaveEmptyEvent(MsgEmptyEvent entity);
+        Task<int> SaveEmptyEvent(MsgEmptyEvent entity);
         Task<int> SaveInlineJsonEvent(MsgInlineJson entity);
-        Task SaveJsonFileEvent(MsgJsonFile entity);
-        Task SaveFlatFileEvent(MsgFlatFile entity);
+        Task<int> SaveJsonFileEvent(MsgJsonFile entity);
+        Task<int> SaveFlatFileEvent(MsgFlatFile entity);
     }
 }
 
