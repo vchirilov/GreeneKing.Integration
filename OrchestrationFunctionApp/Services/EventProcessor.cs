@@ -24,23 +24,12 @@ namespace OrchestrationFunctionApp.Services
     public class EventProcessor: IEventProcessor
     {
         private readonly ILogger<EventProcessor> _logger;
-        private readonly ServiceBusSettings _serviceBusSettings;        
-        private readonly IConfiguration _configuration;
-        private readonly IRepository _repository;
-        private readonly int _delay;
-        private IList<ServiceBusReceivedMessage> _messages = new List<ServiceBusReceivedMessage>();
-        private IList<string> _exceptions = new List<string>();
-        
+        private readonly IRepository _repository;        
 
         public EventProcessor(ILogger<EventProcessor> logger, IOptions<ServiceBusSettings> serviceBusSettings, IConfiguration configuration, IRepository repository)
         {
             _logger = logger;
-            _serviceBusSettings = serviceBusSettings.Value;
-            _configuration = configuration;
             _repository = repository;
-
-            _logger.LogWarning($"Queue defined in configuration is [{_serviceBusSettings.JmsQueueName}]");
-            _delay = int.TryParse(_configuration[ConfigurationKeys.Pause], out int delay) ? delay : 3000;
         }
 
         public async Task SaveMessageAsync<T>(ServiceBusReceivedMessage message) where T : MsgBaseModel, new()
