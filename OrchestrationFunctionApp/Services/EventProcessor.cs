@@ -43,37 +43,6 @@ namespace OrchestrationFunctionApp.Services
             _delay = int.TryParse(_configuration[ConfigurationKeys.Pause], out int delay) ? delay : 3000;
         }
 
-        public async Task PublishAsync<T>(T model)
-        {
-            var serviceBrokerClient = new ServiceBusClient(_serviceBusSettings.ConnectionString);
-            var sender = serviceBrokerClient.CreateSender(_serviceBusSettings.JmsQueueName);
-
-            await SendMessageAsync(sender, model);
-        }
-
-        public async Task<MessageResponse> RetrieveAsync(string queue)
-        {
-            var serviceBrokerClient = new ServiceBusClient(_serviceBusSettings.ConnectionString);
-            var queueProcessor = serviceBrokerClient.CreateProcessor(queue, new ServiceBusProcessorOptions());
-
-            try
-            {
-                queueProcessor.ProcessMessageAsync += MessageHandler;
-                queueProcessor.ProcessErrorAsync += MessageErrorHandler;
-                
-                await queueProcessor.StartProcessingAsync();
-                await Task.Delay(_delay);
-                await queueProcessor.StopProcessingAsync();
-
-                return new MessageResponse { Messages = _messages, Errors = _exceptions };                
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex.Message);
-                return await Task.FromResult(new MessageResponse());
-            }            
-        }
-
         public async Task SaveMessageAsync<T>(ServiceBusReceivedMessage message) where T : MsgBaseModel, new()
         {
             // Initialize the model and populate common properties
@@ -100,40 +69,15 @@ namespace OrchestrationFunctionApp.Services
                 _ => throw new NotSupportedException($"Unsupported model type: {typeof(T)}")
             };
 
-            // Publish message if database operation succeeded
-            if (affectedRows > 0)
-            {
-                await PublishAsync(new MsgJmsModel
-                {
-                    Action = model.PipelineAction,
-                    MessageId = model.MessageId
-                });
-            }
-        }
-
-
-        private async Task SendMessageAsync<T>(ServiceBusSender sender, T model)
-        {
-            var content = JsonConvert.SerializeObject(model);
-            ServiceBusMessage message = new ServiceBusMessage(content);
-            
-            await sender.SendMessageAsync(message);
-        }
-
-        private async Task MessageHandler(ProcessMessageEventArgs args)
-        {
-            //var body = args.Message.Body.ToString();
-            _messages.Add(args.Message);
-
-            //Complete the message, message is deleted from the queue
-            await args.CompleteMessageAsync(args.Message);
-        }
-
-        private async Task MessageErrorHandler(ProcessErrorEventArgs args)
-        {
-            _logger.LogError(args.Exception.Message);
-            _exceptions.Add(args.Exception.Message);
-            await Task.CompletedTask;
-        }
+            //// Publish message if database operation succeeded
+            //if (affectedRows > 0)
+            //{
+            //    await PublishAsync(new MsgJmsModel
+            //    {
+            //        Action = model.PipelineAction,
+            //        MessageId = model.MessageId
+            //    });
+            //}
+        }        
     }
 }

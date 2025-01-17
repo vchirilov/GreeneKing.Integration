@@ -10,8 +10,6 @@ namespace OrchestrationFunctionApp.Services
 {
     public interface IEventProcessor
     {
-        Task PublishAsync<T>(T model);
-        Task<MessageResponse> RetrieveAsync(string queue);
         Task SaveMessageAsync<T>(ServiceBusReceivedMessage message) where T : MsgBaseModel, new();
     }
 }
