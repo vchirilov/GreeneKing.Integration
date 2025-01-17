@@ -1,11 +1,9 @@
 using System;
+using System.Threading.Tasks;
 using Azure.Messaging.ServiceBus;
 using Microsoft.Azure.WebJobs;
-using Microsoft.Azure.WebJobs.Host;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using OrchestrationFunctionApp.Models;
-using OrchestrationFunctionApp.Persistence.Entities;
 using OrchestrationFunctionApp.Services;
 
 namespace OrchestrationFunctionApp.Functions
@@ -23,7 +21,7 @@ namespace OrchestrationFunctionApp.Functions
 
 
         [FunctionName("save-json-inline")]
-        public void Run(
+        public async Task Run(
             [ServiceBusTrigger("sbq-event-json-inline", Connection = "ServiceBusConnectionString")] ServiceBusReceivedMessage message,
             ILogger log)
         {
@@ -31,7 +29,7 @@ namespace OrchestrationFunctionApp.Functions
             {
                 _logger.LogInformation($"save-json-inline-messages: {message}");
 
-                _serviceBroker.SaveMessageAsync<MsgInlineJsonModel>(message).Wait();
+                await _serviceBroker.SaveMessageAsync<MsgInlineJsonModel>(message);
             }
             catch (Exception ex) 
             {

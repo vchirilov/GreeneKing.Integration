@@ -55,6 +55,8 @@ namespace OrchestrationFunctionApp.Services
             {
                 MsgInlineJsonModel inlineJsonModel => await _repository.SaveInlineJsonEvent((MsgInlineJson)inlineJsonModel),
                 MsgEmptyEventModel emptyEventModel => await _repository.SaveEmptyEvent((MsgEmptyEvent)emptyEventModel),
+                MsgJsonFileModel jsonFileModel => await _repository.SaveJsonFileEvent((MsgJsonFile)jsonFileModel),
+                MsgFlatFileModel flatFileModel => await _repository.SaveFlatFileEvent((MsgFlatFile)flatFileModel),
                 _ => throw new NotSupportedException($"Unsupported model type: {typeof(T)}")
             };
 

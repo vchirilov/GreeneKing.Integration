@@ -8,36 +8,34 @@ using OrchestrationFunctionApp.Models;
 using OrchestrationFunctionApp.Services;
 
 namespace OrchestrationFunctionApp.Functions
-{
-    public class SaveEmptyEvent
+{ 
+    public class SaveFlatFile
     {
-        private readonly ILogger<SaveEmptyEvent> _logger;
+        private readonly ILogger<SaveFlatFile> _logger;
         private readonly IEventProcessor _eventProcessor;
 
-        public SaveEmptyEvent(ILogger<SaveEmptyEvent> logger, IEventProcessor eventProcessor)
+        public SaveFlatFile(ILogger<SaveFlatFile> logger, IEventProcessor eventProcessor)
         {
             _logger = logger;
             _eventProcessor = eventProcessor;
         }
 
 
-        [FunctionName("save-empty-event")]
+        [FunctionName("save-flat-file")]
         public async Task Run(
-            [ServiceBusTrigger("sbq-event-empty", Connection = "ServiceBusConnectionString")] ServiceBusReceivedMessage message,
+            [ServiceBusTrigger("sbq-event-flat-file", Connection = "ServiceBusConnectionString")] ServiceBusReceivedMessage message,
             ILogger log)
         {
             try
             {
-                _logger.LogInformation($"sbq-event-empty: {message}");
+                _logger.LogInformation($"sbq-event-flat-file: {message}");
 
-                await _eventProcessor.SaveMessageAsync<MsgEmptyEventModel>(message);
+                await _eventProcessor.SaveMessageAsync<MsgFlatFileModel>(message);
             }
             catch (Exception ex)
             {
-                _logger.LogError($"Function [save-empty-event] has failed with error message: {ex.Message}");
+                _logger.LogError($"Function [save-flat-file] has failed with error message: {ex.Message}");
             }
-
         }
     }
-
 }
