@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.Logging;
+﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 using OrchestrationFunctionApp.Persistence;
 using OrchestrationFunctionApp.Persistence.Entities;
 using System;
@@ -20,6 +21,33 @@ namespace OrchestrationFunctionApp.Services
             _dbContext = dbContext;
         }
 
+        public async Task<IList<MsgEmptyEvent>> GetEligibleEmptyEventItems()
+        {
+            return await _dbContext.MsgEmptyEvents
+                .Where(e => e.Processed == 0)
+                .OrderBy( e => e.SequenceNumber).ToListAsync();
+        }
+
+        public async Task<IList<MsgFlatFile>> GetEligibleFlatFileItems()
+        {
+            return await _dbContext.MsgFlatFiles
+                .Where(e => e.Processed == 0)
+                .OrderBy(e => e.SequenceNumber).ToListAsync();
+        }
+
+        public async Task<IList<MsgInlineJson>> GetEligibleInlineJsonItems()
+        {
+            return await _dbContext.MsgInlineJsons
+                .Where(e => e.Processed == 0)
+                .OrderBy(e => e.SequenceNumber).ToListAsync();
+        }
+
+        public async Task<IList<MsgJsonFile>> GetEligibleJsonFileItems()
+        {
+            return await _dbContext.MsgJsonFiles
+                .Where(e => e.Processed == 0)
+                .OrderBy(e => e.SequenceNumber).ToListAsync();
+        }
 
         public async Task<int> SaveEmptyEvent(MsgEmptyEvent entity)
         {

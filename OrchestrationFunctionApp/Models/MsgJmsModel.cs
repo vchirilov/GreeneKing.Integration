@@ -8,7 +8,9 @@ namespace OrchestrationFunctionApp.Models
 {
     public record MsgJmsModel
     {
-        public string Action {  get; set; }
         public string MessageId { get; set; }
+        public string PipelineAction {  get; set; }
+        public string OrchestrationAction { get; set; }        
     }
 }
+

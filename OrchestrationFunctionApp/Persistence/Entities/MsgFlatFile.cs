@@ -19,5 +19,5 @@ public partial class MsgFlatFile
 
     public string Payload { get; set; }
 
-    public bool? Processed { get; set; }
+    public int Processed { get; set; }
 }

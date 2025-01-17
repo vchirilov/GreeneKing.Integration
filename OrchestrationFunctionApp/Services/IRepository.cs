@@ -13,6 +13,10 @@ namespace OrchestrationFunctionApp.Services
         Task<int> SaveInlineJsonEvent(MsgInlineJson entity);
         Task<int> SaveJsonFileEvent(MsgJsonFile entity);
         Task<int> SaveFlatFileEvent(MsgFlatFile entity);
+        Task<IList<MsgEmptyEvent>> GetEligibleEmptyEventItems();
+        Task<IList<MsgInlineJson>> GetEligibleInlineJsonItems();
+        Task<IList<MsgJsonFile>> GetEligibleJsonFileItems();
+        Task<IList<MsgFlatFile>> GetEligibleFlatFileItems();
     }
 }
 

@@ -34,7 +34,7 @@ namespace OrchestrationFunctionApp.Functions
             }
             catch (Exception ex)
             {
-                _logger.LogError($"Function [save-empty-event] has failed with error message: {ex.Message}");
+                _logger.LogError($"Function [save-empty-event] has failed with error message: {ex}");
             }
 
         }

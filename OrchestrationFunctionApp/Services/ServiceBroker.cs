@@ -17,8 +17,10 @@ namespace OrchestrationFunctionApp.Services
     {
         private readonly ILogger<ServiceBroker> _logger;
         private readonly ServiceBusSettings _serviceBusSettings;
-        private readonly IConfiguration _configuration;        
+        private readonly IConfiguration _configuration;
+        private readonly ServiceBusSender _serviceBusSender;
         private readonly int _delay;
+
         private IList<ServiceBusReceivedMessage> _messages = new List<ServiceBusReceivedMessage>();
         private IList<string> _exceptions = new List<string>();
 
@@ -31,14 +33,14 @@ namespace OrchestrationFunctionApp.Services
 
             _logger.LogWarning($"Queue defined in configuration is [{_serviceBusSettings.JmsQueueName}]");
             _delay = int.TryParse(_configuration[ConfigurationKeys.Pause], out int delay) ? delay : 3000;
+
+            var serviceBrokerClient = new ServiceBusClient(_serviceBusSettings.ConnectionString);
+            _serviceBusSender = serviceBrokerClient.CreateSender(_serviceBusSettings.JmsQueueName);
         }
 
         public async Task PublishAsync<T>(T model)
         {
-            var serviceBrokerClient = new ServiceBusClient(_serviceBusSettings.ConnectionString);
-            var sender = serviceBrokerClient.CreateSender(_serviceBusSettings.JmsQueueName);
-
-            await SendMessageAsync(sender, model);
+            await SendMessageAsync(_serviceBusSender, model);
         }
 
         public async Task<MessageResponse> RetrieveAsync(string queue)

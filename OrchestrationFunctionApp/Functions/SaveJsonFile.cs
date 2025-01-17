@@ -34,7 +34,7 @@ namespace OrchestrationFunctionApp.Functions
             }
             catch (Exception ex)
             {
-                _logger.LogError($"Function [save-json-file] has failed with error message: {ex.Message}");
+                _logger.LogError($"Function [save-json-file] has failed with error message: {ex}");
             }
 
         }

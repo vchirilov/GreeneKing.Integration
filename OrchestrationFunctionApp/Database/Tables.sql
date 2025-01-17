@@ -10,7 +10,7 @@ CREATE TABLE [msgqueue].[MsgFlatFile](
 	[PipelineAction] [varchar](250) NULL,
 	[OrchestrationAction] [varchar](250) NULL,
 	[Payload] [nvarchar](max) NULL,
-	[Processed] [bit] NULL,
+	[Processed] [int] NULL,
 PRIMARY KEY CLUSTERED 
 (
 	[Id] ASC
@@ -30,7 +30,7 @@ CREATE TABLE [msgqueue].[MsgEmptyEvent](
 	[PipelineAction] [varchar](250) NULL,
 	[OrchestrationAction] [varchar](250) NULL,
 	[Payload] [nvarchar](max) NULL,
-	[Processed] [bit] NULL,
+	[Processed] [int] NULL,
 PRIMARY KEY CLUSTERED 
 (
 	[Id] ASC
@@ -50,7 +50,7 @@ CREATE TABLE [msgqueue].[MsgInlineJson](
 	[PipelineAction] [varchar](250) NULL,
 	[OrchestrationAction] [varchar](250) NULL,
 	[Payload] [nvarchar](max) NULL,
-	[Processed] [bit] NULL,
+	[Processed] [int] NULL,
 PRIMARY KEY CLUSTERED 
 (
 	[Id] ASC
@@ -70,7 +70,7 @@ CREATE TABLE [msgqueue].[MsgJsonFile](
 	[PipelineAction] [varchar](250) NULL,
 	[OrchestrationAction] [varchar](250) NULL,
 	[Payload] [nvarchar](max) NULL,
-	[Processed] [bit] NULL,
+	[Processed] [int] NULL,
 PRIMARY KEY CLUSTERED 
 (
 	[Id] ASC
@@ -90,7 +90,7 @@ CREATE TABLE [msgqueue].[MsgXmlFile](
 	[PipelineAction] [varchar](250) NULL,
 	[OrchestrationAction] [varchar](250) NULL,
 	[Payload] [nvarchar](max) NULL,
-	[Processed] [bit] NULL,
+	[Processed] [int] NULL,
 PRIMARY KEY CLUSTERED 
 (
 	[Id] ASC
