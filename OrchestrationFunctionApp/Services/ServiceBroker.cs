@@ -30,8 +30,7 @@ namespace OrchestrationFunctionApp.Services
             _logger = logger;
             _serviceBusSettings = serviceBusSettings.Value;
             _configuration = configuration;
-
-            _logger.LogWarning($"Queue defined in configuration is [{_serviceBusSettings.JmsQueueName}]");
+            
             _delay = int.TryParse(_configuration[ConfigurationKeys.Pause], out int delay) ? delay : 3000;
 
             var serviceBrokerClient = new ServiceBusClient(_serviceBusSettings.ConnectionString);
