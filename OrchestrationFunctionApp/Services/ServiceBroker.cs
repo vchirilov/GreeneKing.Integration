@@ -17,22 +17,16 @@ namespace OrchestrationFunctionApp.Services
     {
         private readonly ILogger<ServiceBroker> _logger;
         private readonly ServiceBusSettings _serviceBusSettings;
-        private readonly IConfiguration _configuration;
         private readonly ServiceBusSender _serviceBusSender;
-        private readonly int _delay;
 
         private IList<ServiceBusReceivedMessage> _messages = new List<ServiceBusReceivedMessage>();
         private IList<string> _exceptions = new List<string>();
 
 
-        public ServiceBroker(ILogger<ServiceBroker> logger, IOptions<ServiceBusSettings> serviceBusSettings, IConfiguration configuration)
+        public ServiceBroker(ILogger<ServiceBroker> logger, IOptions<ServiceBusSettings> serviceBusSettings)
         {
             _logger = logger;
             _serviceBusSettings = serviceBusSettings.Value;
-            _configuration = configuration;
-            
-            _delay = int.TryParse(_configuration[ConfigurationKeys.Pause], out int delay) ? delay : 3000;
-
             var serviceBrokerClient = new ServiceBusClient(_serviceBusSettings.ConnectionString);
             _serviceBusSender = serviceBrokerClient.CreateSender(_serviceBusSettings.JmsQueueName);
         }
@@ -53,7 +47,7 @@ namespace OrchestrationFunctionApp.Services
                 queueProcessor.ProcessErrorAsync += MessageErrorHandler;
 
                 await queueProcessor.StartProcessingAsync();
-                await Task.Delay(_delay);
+                await Task.Delay(3000);
                 await queueProcessor.StopProcessingAsync();
 
                 return new MessageResponse { Messages = _messages, Errors = _exceptions };
