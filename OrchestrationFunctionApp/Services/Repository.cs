@@ -71,6 +71,16 @@ namespace OrchestrationFunctionApp.Services
         {
             await _dbContext.MsgJsonFiles.AddAsync(entity);
             return await _dbContext.SaveChangesAsync();
+        }        
+
+        public async Task UpdateStatus<TEntity, TKey>(TKey id) where TEntity : class
+        {
+            dynamic entity = await _dbContext.Set<TEntity>().FindAsync(id);
+            entity.Processed = 1;
+            _dbContext.SaveChanges();
+
         }
     }
 }
+
+

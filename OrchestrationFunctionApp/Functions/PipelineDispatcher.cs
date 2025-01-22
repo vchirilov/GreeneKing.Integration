@@ -8,6 +8,7 @@ using Microsoft.Azure.WebJobs.Host;
 using Microsoft.Extensions.Logging;
 using Microsoft.Identity.Client;
 using OrchestrationFunctionApp.Models;
+using OrchestrationFunctionApp.Persistence.Entities;
 using OrchestrationFunctionApp.Services;
 
 namespace OrchestrationFunctionApp.Functions
@@ -26,21 +27,17 @@ namespace OrchestrationFunctionApp.Functions
         }
 
         [FunctionName("pipeline-dispatcher")]
-        public async Task Run([TimerTrigger("0 * * * *")] TimerInfo myTimer, ILogger log)
+        public async Task Run([TimerTrigger("* * * * *")] TimerInfo myTimer, ILogger log)
         {
             try
             {
                 _logger.LogInformation($"Function [pipeline-dispatcher] has started");
 
-                var eligibleItems = await GetMsgJsmModelsAsync();
+                await ProcessNewEmptyEventItems();
+                await ProcessNewInlineJsonItems();
+                await ProcessNewJsonFileItems();
+                await ProcessNewFlatFileItems();
 
-                _logger.LogInformation($"{eligibleItems.Count} of new events have been identified.");
-
-                foreach (var item in eligibleItems)
-                {
-                    await _serviceBroker.PublishAsync(item);
-                    await Task.Delay(200);
-                }
 
                 _logger.LogInformation($"Function [pipeline-dispatcher] has finished");
             }
@@ -48,24 +45,59 @@ namespace OrchestrationFunctionApp.Functions
             {
                 _logger.LogError($"Function [pipeline-dispatcher] has failed with error message: {ex}");
             }
-            
+
         }
 
-        private async Task<IList<MsgJmsModel>> GetMsgJsmModelsAsync()
+        private async Task ProcessNewItems<TEntity>(Func<Task<IList<TEntity>>> func, string logPrefix)  where TEntity : class
         {
-            var eligibleEvents = (await _repository.GetEligibleEmptyEventItems())
-                .Select(x => new MsgJmsModel { MessageId = x.MessageId, PipelineAction = x.PipelineAction, OrchestrationAction = x.OrchestrationAction }).ToList();
+            var items = (await func())
+                .Select(x =>
+                new
+                {
+                    Id = (int)typeof(TEntity).GetProperty("Id")!.GetValue(x)!,
+                    model = new MsgJmsModel
+                    {
+                        MessageId = (string)typeof(TEntity).GetProperty("MessageId")!.GetValue(x)!,
+                        PipelineAction = (string)typeof(TEntity).GetProperty("PipelineAction")!.GetValue(x)!,
+                        OrchestrationAction = (string)typeof(TEntity).GetProperty("OrchestrationAction")!.GetValue(x)!
+                    }
+                }).ToList();
 
-            eligibleEvents.AddRange((await _repository.GetEligibleInlineJsonItems())
-                .Select(x => new MsgJmsModel { MessageId = x.MessageId, PipelineAction = x.PipelineAction, OrchestrationAction = x.OrchestrationAction }).ToList());
-
-            eligibleEvents.AddRange((await _repository.GetEligibleJsonFileItems())
-                .Select(x => new MsgJmsModel { MessageId = x.MessageId, PipelineAction = x.PipelineAction, OrchestrationAction = x.OrchestrationAction }).ToList());
-
-            eligibleEvents.AddRange((await _repository.GetEligibleFlatFileItems())
-                .Select(x => new MsgJmsModel { MessageId = x.MessageId, PipelineAction = x.PipelineAction, OrchestrationAction = x.OrchestrationAction }).ToList());
-
-            return eligibleEvents;
+            foreach (var item in items)
+            {
+                try
+                {
+                    await _serviceBroker.PublishAsync(item);
+                    await _repository.UpdateStatus<TEntity, int>(item.Id);
+                    _logger.LogInformation($"Message {item.model.MessageId} has been published to queue [sbq-event-jms-job] and flagged with Processed = 1");
+                    await Task.Delay(200);
+                }
+                catch (Exception ex)
+                {
+                    _logger.LogError($"Publishing {logPrefix} to queue [sbq-event-jms-job] has failed with exception: {ex.Message}", ex);
+                }
+            }
         }
+
+        private async Task ProcessNewEmptyEventItems()
+        {
+            await ProcessNewItems<MsgEmptyEvent>(_repository.GetEligibleEmptyEventItems, "EmptyEvent");
+        }
+
+        private async Task ProcessNewInlineJsonItems()
+        {
+            await ProcessNewItems<MsgInlineJson>(_repository.GetEligibleInlineJsonItems, "InlineJson");
+        }
+
+        private async Task ProcessNewJsonFileItems()
+        {
+            await ProcessNewItems<MsgJsonFile>(_repository.GetEligibleJsonFileItems, "JsonFile");
+        }
+
+        private async Task ProcessNewFlatFileItems()
+        {
+            await ProcessNewItems<MsgFlatFile>(_repository.GetEligibleFlatFileItems, "FlatFile");
+        }
+
     }
 }

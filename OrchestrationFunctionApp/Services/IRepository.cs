@@ -17,6 +17,7 @@ namespace OrchestrationFunctionApp.Services
         Task<IList<MsgInlineJson>> GetEligibleInlineJsonItems();
         Task<IList<MsgJsonFile>> GetEligibleJsonFileItems();
         Task<IList<MsgFlatFile>> GetEligibleFlatFileItems();
+        Task UpdateStatus<TEntity, TKey>(TKey id) where TEntity : class;
     }
 }
 
