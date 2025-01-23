@@ -7,6 +7,7 @@ using Microsoft.Azure.WebJobs;
 using Microsoft.Azure.WebJobs.Host;
 using Microsoft.Extensions.Logging;
 using Microsoft.Identity.Client;
+using OrchestrationFunctionApp.Enums;
 using OrchestrationFunctionApp.Models;
 using OrchestrationFunctionApp.Persistence.Entities;
 using OrchestrationFunctionApp.Services;
@@ -48,18 +49,24 @@ namespace OrchestrationFunctionApp.Functions
 
         }
 
-        private async Task ProcessNewItems<TEntity>(Func<Task<IList<TEntity>>> func, string logPrefix)  where TEntity : class
-        {
+        private async Task ProcessNewItems<TEntity>(Func<Task<IList<TEntity>>> func, EventType eventType)  where TEntity : class
+        {                        
+            //If pipeline dispatcher is disabled then, exit the method
+            if (!await _repository.IsPipelineDispatcerEnabled((int)eventType))
+            {
+                return;
+            }
+
             var items = (await func())
-                .Select(x =>
+                .Select(entity =>
                 new
                 {
-                    Id = (int)typeof(TEntity).GetProperty("Id")!.GetValue(x)!,
+                    Id = (int)typeof(TEntity).GetProperty("Id")!.GetValue(entity)!,
                     model = new MsgJmsModel
                     {
-                        MessageId = (string)typeof(TEntity).GetProperty("MessageId")!.GetValue(x)!,
-                        PipelineAction = (string)typeof(TEntity).GetProperty("PipelineAction")!.GetValue(x)!,
-                        OrchestrationAction = (string)typeof(TEntity).GetProperty("OrchestrationAction")!.GetValue(x)!
+                        MessageId = (string)typeof(TEntity).GetProperty("MessageId")!.GetValue(entity)!,
+                        PipelineAction = (string)typeof(TEntity).GetProperty("PipelineAction")!.GetValue(entity)!,
+                        OrchestrationAction = (string)typeof(TEntity).GetProperty("OrchestrationAction")!.GetValue(entity)!
                     }
                 }).ToList();
 
@@ -74,29 +81,29 @@ namespace OrchestrationFunctionApp.Functions
                 }
                 catch (Exception ex)
                 {
-                    _logger.LogError($"Publishing {logPrefix} to queue [sbq-event-jms-job] has failed with exception: {ex.Message}", ex);
+                    _logger.LogError($"Publishing {eventType} to queue [sbq-event-jms-job] has failed with exception: {ex.Message}", ex);
                 }
             }
         }
 
         private async Task ProcessNewEmptyEventItems()
         {
-            await ProcessNewItems<MsgEmptyEvent>(_repository.GetEligibleEmptyEventItems, "EmptyEvent");
+            await ProcessNewItems<MsgEmptyEvent>(_repository.GetEligibleEmptyEventItems, EventType.EmptyEvent);
         }
 
         private async Task ProcessNewInlineJsonItems()
         {
-            await ProcessNewItems<MsgInlineJson>(_repository.GetEligibleInlineJsonItems, "InlineJson");
+            await ProcessNewItems<MsgInlineJson>(_repository.GetEligibleInlineJsonItems, EventType.InlineJson);
         }
 
         private async Task ProcessNewJsonFileItems()
         {
-            await ProcessNewItems<MsgJsonFile>(_repository.GetEligibleJsonFileItems, "JsonFile");
+            await ProcessNewItems<MsgJsonFile>(_repository.GetEligibleJsonFileItems, EventType.JsonFile);
         }
 
         private async Task ProcessNewFlatFileItems()
         {
-            await ProcessNewItems<MsgFlatFile>(_repository.GetEligibleFlatFileItems, "FlatFile");
+            await ProcessNewItems<MsgFlatFile>(_repository.GetEligibleFlatFileItems, EventType.FlatFile);
         }
 
     }

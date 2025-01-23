@@ -26,6 +26,8 @@ public partial class GreeeKingMessageBusContext : DbContext
 
     public virtual DbSet<MsgXmlFile> MsgXmlFiles { get; set; }
 
+    public virtual DbSet<PipelineDispatcerSemaphore> PipelineDispatcerSemaphores { get; set; }
+
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.Entity<MsgFlatFile>(entity =>
@@ -126,6 +128,17 @@ public partial class GreeeKingMessageBusContext : DbContext
                 .IsUnicode(false)
                 .HasColumnName("MessageID");
             entity.Property(e => e.Processed).HasDefaultValueSql("((0))");
+        });
+
+        modelBuilder.Entity<PipelineDispatcerSemaphore>(entity =>
+        {
+            entity.ToTable("PipelineDispatcerSemaphore", "msgqueue");
+
+            entity.Property(e => e.Id).HasColumnName("ID");
+            entity.Property(e => e.QueueName)
+                .HasMaxLength(100)
+                .IsUnicode(true);            
+            entity.Property(e => e.IsPipelineDispatcerEnabled).HasDefaultValueSql("((0))");
         });
 
         OnModelCreatingPartial(modelBuilder);

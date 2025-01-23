@@ -49,6 +49,12 @@ namespace OrchestrationFunctionApp.Services
                 .OrderBy(e => e.SequenceNumber).ToListAsync();
         }
 
+        public async Task<bool> IsPipelineDispatcerEnabled(int Id)
+        {
+            return (await _dbContext.PipelineDispatcerSemaphores.FindAsync(Id))
+                .IsPipelineDispatcerEnabled;
+        }
+
         public async Task<int> SaveEmptyEvent(MsgEmptyEvent entity)
         {
             await _dbContext.MsgEmptyEvents.AddAsync(entity);
