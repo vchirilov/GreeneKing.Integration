@@ -8,35 +8,34 @@ using OrchestrationFunctionApp.Models;
 using OrchestrationFunctionApp.Services;
 
 namespace OrchestrationFunctionApp.Functions
-{
-    public class SaveJsonFile
+{ 
+    public class MonitorFlatFileEvents
     {
-        private readonly ILogger<SaveJsonFile> _logger;
+        private readonly ILogger<MonitorFlatFileEvents> _logger;
         private readonly IEventProcessor _eventProcessor;
 
-        public SaveJsonFile(ILogger<SaveJsonFile> logger, IEventProcessor eventProcessor)
+        public MonitorFlatFileEvents(ILogger<MonitorFlatFileEvents> logger, IEventProcessor eventProcessor)
         {
             _logger = logger;
             _eventProcessor = eventProcessor;
         }
 
 
-        [FunctionName("save-json-file")]
+        [FunctionName("monitor-flat-file-events")]
         public async Task Run(
-            [ServiceBusTrigger("sbq-event-json-file", Connection = "ServiceBusConnectionString")] ServiceBusReceivedMessage message,
+            [ServiceBusTrigger("sbq-event-flat-file", Connection = "ServiceBusConnectionString")] ServiceBusReceivedMessage message,
             ILogger log)
         {
             try
             {
-                _logger.LogInformation( $"sbq-event-json-file: {message}");
+                _logger.LogInformation($"sbq-event-flat-file: {message}");
 
-                await _eventProcessor.SaveMessageAsync<MsgJsonFileModel>(message);
+                await _eventProcessor.SaveMessageAsync<MsgFlatFileModel>(message);
             }
             catch (Exception ex)
             {
-                _logger.LogError($"Function [save-json-file] has failed with error message: {ex}");
+                _logger.LogError($"Function [save-flat-file] has failed with error message: {ex}");
             }
-
         }
     }
 }

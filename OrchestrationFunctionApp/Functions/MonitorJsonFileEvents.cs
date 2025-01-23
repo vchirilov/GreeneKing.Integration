@@ -9,35 +9,34 @@ using OrchestrationFunctionApp.Services;
 
 namespace OrchestrationFunctionApp.Functions
 {
-    public class SaveEmptyEvent
+    public class MonitorJsonFileEvents
     {
-        private readonly ILogger<SaveEmptyEvent> _logger;
+        private readonly ILogger<MonitorJsonFileEvents> _logger;
         private readonly IEventProcessor _eventProcessor;
 
-        public SaveEmptyEvent(ILogger<SaveEmptyEvent> logger, IEventProcessor eventProcessor)
+        public MonitorJsonFileEvents(ILogger<MonitorJsonFileEvents> logger, IEventProcessor eventProcessor)
         {
             _logger = logger;
             _eventProcessor = eventProcessor;
         }
 
 
-        [FunctionName("save-empty-event")]
+        [FunctionName("monitor-json-file-events")]
         public async Task Run(
-            [ServiceBusTrigger("sbq-event-empty", Connection = "ServiceBusConnectionString")] ServiceBusReceivedMessage message,
+            [ServiceBusTrigger("sbq-event-json-file", Connection = "ServiceBusConnectionString")] ServiceBusReceivedMessage message,
             ILogger log)
         {
             try
             {
-                _logger.LogInformation($"sbq-event-empty: {message}");
+                _logger.LogInformation( $"sbq-event-json-file: {message}");
 
-                await _eventProcessor.SaveMessageAsync<MsgEmptyEventModel>(message);
+                await _eventProcessor.SaveMessageAsync<MsgJsonFileModel>(message);
             }
             catch (Exception ex)
             {
-                _logger.LogError($"Function [save-empty-event] has failed with error message: {ex}");
+                _logger.LogError($"Function [save-json-file] has failed with error message: {ex}");
             }
 
         }
     }
-
 }

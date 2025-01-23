@@ -8,19 +8,19 @@ using OrchestrationFunctionApp.Services;
 
 namespace OrchestrationFunctionApp.Functions
 {
-    public class SaveJsonInlineMessages
+    public class MonitorJsonInlineEvents
     {
-        private readonly ILogger<SaveJsonInlineMessages> _logger;
+        private readonly ILogger<MonitorJsonInlineEvents> _logger;
         private readonly IEventProcessor _serviceBroker;
 
-        public SaveJsonInlineMessages(ILogger<SaveJsonInlineMessages> logger, IEventProcessor serviceBroker)
+        public MonitorJsonInlineEvents(ILogger<MonitorJsonInlineEvents> logger, IEventProcessor serviceBroker)
         {
             _logger = logger;
             _serviceBroker = serviceBroker;
         }
 
 
-        [FunctionName("save-json-inline")]
+        [FunctionName("monitor-json-inline-events")]
         public async Task Run(
             [ServiceBusTrigger("sbq-event-json-inline", Connection = "ServiceBusConnectionString")] ServiceBusReceivedMessage message,
             ILogger log)
