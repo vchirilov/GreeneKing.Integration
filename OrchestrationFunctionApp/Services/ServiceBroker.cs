@@ -17,7 +17,8 @@ namespace OrchestrationFunctionApp.Services
     {
         private readonly ILogger<ServiceBroker> _logger;
         private readonly ServiceBusSettings _serviceBusSettings;
-        private readonly ServiceBusSender _serviceBusSender;
+        private readonly ServiceBusSender _jmsAllMessagesQueueSender;
+        private readonly ServiceBusSender _jmsOrchestrationsQueueSender;
 
         private IList<ServiceBusReceivedMessage> _messages = new List<ServiceBusReceivedMessage>();
         private IList<string> _exceptions = new List<string>();
@@ -28,13 +29,19 @@ namespace OrchestrationFunctionApp.Services
             _logger = logger;
             _serviceBusSettings = serviceBusSettings.Value;
             var serviceBrokerClient = new ServiceBusClient(_serviceBusSettings.ConnectionString);
-            _serviceBusSender = serviceBrokerClient.CreateSender(_serviceBusSettings.JmsQueueName);
+            _jmsAllMessagesQueueSender = serviceBrokerClient.CreateSender(_serviceBusSettings.JmsQueueAllMessages);
+            _jmsOrchestrationsQueueSender = serviceBrokerClient.CreateSender(_serviceBusSettings.JmsQueueOrchestrations);
         }
 
-        public async Task PublishAsync<T>(T model)
+        public async Task PublishJmsQueueAllMessagesAsync<T>(T model)
         {
-            await SendMessageAsync(_serviceBusSender, model);
+            await SendMessageAsync(_jmsAllMessagesQueueSender, model);
         }
+
+        public async Task PublishJmsQueueOrchestrationsAsync<T>(T model)
+        {
+            await SendMessageAsync(_jmsOrchestrationsQueueSender, model);
+        }        
 
         public async Task<MessageResponse> RetrieveAsync(string queue)
         {

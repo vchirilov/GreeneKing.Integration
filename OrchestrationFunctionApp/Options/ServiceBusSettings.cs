@@ -9,6 +9,7 @@ namespace OrchestrationFunctionApp.Options
     public class ServiceBusSettings
     {
         public string ConnectionString { get; set; }
-        public string JmsQueueName { get; set; }
+        public string JmsQueueAllMessages { get; set; }
+        public string JmsQueueOrchestrations { get; set; }
     }
 }

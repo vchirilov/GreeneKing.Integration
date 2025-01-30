@@ -9,7 +9,8 @@ namespace OrchestrationFunctionApp.Services
 {
     public interface IServiceBroker
     {
-        Task PublishAsync<T>(T model);
+        Task PublishJmsQueueAllMessagesAsync<T>(T model);
+        Task PublishJmsQueueOrchestrationsAsync<T>(T model);
         Task<MessageResponse> RetrieveAsync(string queue);
     }
 }

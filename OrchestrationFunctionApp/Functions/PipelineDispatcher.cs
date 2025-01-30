@@ -7,6 +7,7 @@ using Microsoft.Azure.WebJobs;
 using Microsoft.Azure.WebJobs.Host;
 using Microsoft.Extensions.Logging;
 using Microsoft.Identity.Client;
+using Microsoft.IdentityModel.Tokens;
 using OrchestrationFunctionApp.Enums;
 using OrchestrationFunctionApp.Models;
 using OrchestrationFunctionApp.Persistence.Entities;
@@ -29,7 +30,7 @@ namespace OrchestrationFunctionApp.Functions
 
         [FunctionName("pipeline-dispatcher")]
         public async Task Run([TimerTrigger("* * * * *")] TimerInfo myTimer, ILogger log)
-        {
+        {            
             try
             {
                 _logger.LogInformation($"Function [pipeline-dispatcher] has started");
@@ -37,8 +38,7 @@ namespace OrchestrationFunctionApp.Functions
                 await ProcessNewEmptyEventItems();
                 await ProcessNewInlineJsonItems();
                 await ProcessNewJsonFileItems();
-                await ProcessNewFlatFileItems();
-
+                await ProcessNewFlatFileItems();                
 
                 _logger.LogInformation($"Function [pipeline-dispatcher] has finished");
             }
@@ -48,9 +48,9 @@ namespace OrchestrationFunctionApp.Functions
             }
 
         }
-
+        
         private async Task ProcessNewItems<TEntity>(Func<Task<IList<TEntity>>> func, EventType eventType)  where TEntity : class
-        {                        
+        {
             //If pipeline dispatcher is disabled then, exit the method
             if (!await _repository.IsPipelineDispatcerEnabled((int)eventType))
             {
@@ -74,15 +74,25 @@ namespace OrchestrationFunctionApp.Functions
             {
                 try
                 {
-                    await _serviceBroker.PublishAsync(item);
-                    await _repository.UpdateStatus<TEntity, int>(item.Id);
-                    _logger.LogInformation($"Message {item.model.MessageId} has been published to queue [sbq-event-jms-job] and flagged with Processed = 1");
+                    await _serviceBroker.PublishJmsQueueAllMessagesAsync(item);
+                    await _repository.UpdateStatus<TEntity, int>(item.Id);                    
+                    _logger.LogInformation($"Message {item.model.MessageId} has been published to queue [{Constants.QUEUE_JMS_JOB_ALL_MESSAGES}] and flagged with Processed = 1");
                     await Task.Delay(200);
                 }
                 catch (Exception ex)
                 {
-                    _logger.LogError($"Publishing {eventType} to queue [sbq-event-jms-job] has failed with exception: {ex.Message}", ex);
+                    _logger.LogError($"Publishing {eventType} to queue [{Constants.QUEUE_JMS_JOB_ALL_MESSAGES}] has failed with exception: {ex.Message}", ex);
                 }
+            }
+
+            await UpdateJmsQueueOrchestrations(items.Select(x => x.model.OrchestrationAction).ToList());
+        }
+
+        private async Task UpdateJmsQueueOrchestrations(IList<string> orchestratiosWithStatusZero)
+        {
+            foreach (var orchestration in orchestratiosWithStatusZero)
+            {
+                await _serviceBroker.PublishJmsQueueOrchestrationsAsync(orchestration);
             }
         }
 
