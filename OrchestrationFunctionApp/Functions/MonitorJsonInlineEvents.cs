@@ -11,12 +11,12 @@ namespace OrchestrationFunctionApp.Functions
     public class MonitorJsonInlineEvents
     {
         private readonly ILogger<MonitorJsonInlineEvents> _logger;
-        private readonly IEventProcessor _serviceBroker;
+        private readonly IEventProcessor _eventProcessor;
 
-        public MonitorJsonInlineEvents(ILogger<MonitorJsonInlineEvents> logger, IEventProcessor serviceBroker)
+        public MonitorJsonInlineEvents(ILogger<MonitorJsonInlineEvents> logger, IEventProcessor eventProcessor)
         {
             _logger = logger;
-            _serviceBroker = serviceBroker;
+            _eventProcessor = eventProcessor;
         }
 
 
@@ -29,7 +29,7 @@ namespace OrchestrationFunctionApp.Functions
             {
                 _logger.LogInformation($"save-json-inline-messages: {message}");
 
-                await _serviceBroker.SaveMessageAsync<MsgInlineJsonModel>(message);
+                await _eventProcessor.SaveMessageAsync<MsgInlineJsonModel>(message);
             }
             catch (Exception ex) 
             {

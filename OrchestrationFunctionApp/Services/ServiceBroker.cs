@@ -1,4 +1,5 @@
 ﻿using Azure.Messaging.ServiceBus;
+using Microsoft.Azure.Amqp.Framing;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
@@ -17,8 +18,10 @@ namespace OrchestrationFunctionApp.Services
     {
         private readonly ILogger<ServiceBroker> _logger;
         private readonly ServiceBusSettings _serviceBusSettings;
+        private readonly ServiceBusClient _serviceBrokerClient;
         private readonly ServiceBusSender _jmsAllMessagesQueueSender;
         private readonly ServiceBusSender _jmsOrchestrationsQueueSender;
+        private readonly ServiceBusReceiver _jmsOrchestrationsQueueReceiver;
 
         private IList<ServiceBusReceivedMessage> _messages = new List<ServiceBusReceivedMessage>();
         private IList<string> _exceptions = new List<string>();
@@ -28,9 +31,9 @@ namespace OrchestrationFunctionApp.Services
         {
             _logger = logger;
             _serviceBusSettings = serviceBusSettings.Value;
-            var serviceBrokerClient = new ServiceBusClient(_serviceBusSettings.ConnectionString);
-            _jmsAllMessagesQueueSender = serviceBrokerClient.CreateSender(_serviceBusSettings.JmsQueueAllMessages);
-            _jmsOrchestrationsQueueSender = serviceBrokerClient.CreateSender(_serviceBusSettings.JmsQueueOrchestrations);
+            _serviceBrokerClient = new ServiceBusClient(_serviceBusSettings.ConnectionString);
+            _jmsAllMessagesQueueSender = _serviceBrokerClient.CreateSender(_serviceBusSettings.JmsQueueAllMessages);
+            _jmsOrchestrationsQueueSender = _serviceBrokerClient.CreateSender(_serviceBusSettings.JmsQueueOrchestrations);            
         }
 
         public async Task PublishJmsQueueAllMessagesAsync<T>(T model)
@@ -89,6 +92,14 @@ namespace OrchestrationFunctionApp.Services
             _logger.LogError(args.Exception.Message);
             _exceptions.Add(args.Exception.Message);
             await Task.CompletedTask;
+        }
+
+        public async Task<IList<string>> PeekExistingOrchestrationsAsync()
+        {
+            var jmsOrchestrationsQueueReceiver = _serviceBrokerClient.CreateReceiver(_serviceBusSettings.JmsQueueOrchestrations);
+            var messages = await jmsOrchestrationsQueueReceiver.PeekMessagesAsync(maxMessages: 10000);
+
+            return messages.Select(x => x.Body.ToString()).ToList();            
         }
     }
 }

@@ -12,5 +12,6 @@ namespace OrchestrationFunctionApp.Services
         Task PublishJmsQueueAllMessagesAsync<T>(T model);
         Task PublishJmsQueueOrchestrationsAsync<T>(T model);
         Task<MessageResponse> RetrieveAsync(string queue);
+        Task<IList<string>> PeekExistingOrchestrationsAsync();
     }
 }

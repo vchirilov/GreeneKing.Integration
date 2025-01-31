@@ -8,6 +8,7 @@ using Microsoft.Azure.WebJobs.Host;
 using Microsoft.Extensions.Logging;
 using Microsoft.Identity.Client;
 using Microsoft.IdentityModel.Tokens;
+using Microsoft.VisualBasic;
 using OrchestrationFunctionApp.Enums;
 using OrchestrationFunctionApp.Models;
 using OrchestrationFunctionApp.Persistence.Entities;
@@ -66,7 +67,8 @@ namespace OrchestrationFunctionApp.Functions
                     {
                         MessageId = (string)typeof(TEntity).GetProperty("MessageId")!.GetValue(entity)!,
                         PipelineAction = (string)typeof(TEntity).GetProperty("PipelineAction")!.GetValue(entity)!,
-                        OrchestrationAction = (string)typeof(TEntity).GetProperty("OrchestrationAction")!.GetValue(entity)!
+                        OrchestrationAction = (string)typeof(TEntity).GetProperty("OrchestrationAction")!.GetValue(entity)!,
+                        Payload = (string)typeof(TEntity).GetProperty("Payload")!.GetValue(entity)!
                     }
                 }).ToList();
 
@@ -90,8 +92,15 @@ namespace OrchestrationFunctionApp.Functions
 
         private async Task UpdateJmsQueueOrchestrations(IList<string> orchestratiosWithStatusZero)
         {
-            foreach (var orchestration in orchestratiosWithStatusZero)
+            var existingOrcestrationsInQueue = await _serviceBroker.PeekExistingOrchestrationsAsync();
+
+            var cleanedStrings = existingOrcestrationsInQueue.Select(s => s.Trim('"', '\'')).ToList();
+
+            var newOrchestrations = orchestratiosWithStatusZero.Except(cleanedStrings);
+
+            foreach (var orchestration in newOrchestrations)
             {
+                var cleanValue = orchestration.Trim('"', '\'');
                 await _serviceBroker.PublishJmsQueueOrchestrationsAsync(orchestration);
             }
         }

@@ -10,7 +10,8 @@ namespace OrchestrationFunctionApp.Models
     {
         public string MessageId { get; set; }
         public string PipelineAction {  get; set; }
-        public string OrchestrationAction { get; set; }        
+        public string OrchestrationAction { get; set; }
+        public string Payload { get; set; }
     }
 }
 

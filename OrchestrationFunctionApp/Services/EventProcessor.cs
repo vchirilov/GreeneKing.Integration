@@ -59,16 +59,6 @@ namespace OrchestrationFunctionApp.Services
                 MsgFlatFileModel flatFileModel => await _repository.SaveFlatFileEvent((MsgFlatFile)flatFileModel),
                 _ => throw new NotSupportedException($"Unsupported model type: {typeof(T)}")
             };
-
-            //// Publish message if database operation succeeded
-            //if (affectedRows > 0)
-            //{
-            //    await PublishAsync(new MsgJmsModel
-            //    {
-            //        Action = model.PipelineAction,
-            //        MessageId = model.MessageId
-            //    });
-            //}
         }        
     }
 }
