@@ -30,7 +30,7 @@ namespace OrchestrationFunctionApp.Functions
         }
 
         [FunctionName("pipeline-dispatcher")]
-        public async Task Run([TimerTrigger("* * * * *")] TimerInfo myTimer, ILogger log)
+        public async Task Run([TimerTrigger("%TIMER_SCHEDULE%")] TimerInfo myTimer, ILogger log)
         {            
             try
             {
